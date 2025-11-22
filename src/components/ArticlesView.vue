@@ -62,10 +62,12 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
 })
 
 const renderedArticles = computed(() =>
-  articlesMeta.map((article) => ({
-    ...article,
-    displayDate: dateFormatter.format(new Date(article.date))
-  }))
+  [...articlesMeta]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .map((article) => ({
+      ...article,
+      displayDate: dateFormatter.format(new Date(article.date))
+    }))
 )
 
 const currentYear = new Date().getFullYear()
