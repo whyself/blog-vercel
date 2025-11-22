@@ -6,7 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/Blog/', // 替换为你的GitHub仓库名
+  base: '/', 
   plugins: [
      vue(),
     vueDevTools(),
