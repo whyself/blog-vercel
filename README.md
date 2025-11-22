@@ -2,6 +2,6 @@
 
 访问博客：
 
-https://www.whyself.cn/articles
+https://www.whyself.cn/
 
 https://blog-nine-rouge-86.vercel.app/
