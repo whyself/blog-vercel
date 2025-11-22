@@ -29,7 +29,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory('/Blog/'), // 匹配vite.config.js的base
+  history: createWebHistory('/'), // 匹配vite.config.js的base
   routes
 })
 
