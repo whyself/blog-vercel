@@ -8,39 +8,41 @@ const navClass = (key: string) =>
   }`;
 ---
 
-<aside class="w-full lg:w-80 p-8 lg:p-12 lg:sticky lg:top-16 lg:h-fit flex flex-col lg:space-y-12">
-  <div class="flex items-start gap-5 lg:flex-col lg:gap-6">
-    <div class="w-24 h-24 bg-surface-container-highest overflow-hidden rounded-sm shrink-0">
-      <img alt="whyself" class="w-full h-full object-cover" decoding="async" height="96" loading="lazy" src={`${base}images/profile-avatar.jpg`} width="96" />
-    </div>
-    <div class="min-w-0 flex-1">
-      <h2 class="font-headline font-black uppercase text-sm tracking-widest text-on-surface">whyself</h2>
-      <p class="font-body italic text-lg text-secondary">Racing with death.</p>
-      <div class="mt-4 flex items-center gap-2 text-outline">
-        <a
-          aria-label="GitHub"
-          class="hover:text-on-surface transition-colors duration-200"
-          href="https://github.com/whyself"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <svg aria-hidden="true" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.9.58.11.79-.25.79-.56v-1.97c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.74 2.67 1.24 3.33.95.1-.74.4-1.24.73-1.53-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.73 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.28 5.69.41.36.78 1.07.78 2.16v3.19c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-          </svg>
-        </a>
-        <a aria-label="Email" class="hover:text-on-surface transition-colors duration-200" href="mailto:251502023@smail.nju.edu.cn">
-          <svg aria-hidden="true" class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24">
-            <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
-            <path d="m22 8-10 7L2 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
-          </svg>
-        </a>
+<aside class="w-full lg:w-80 p-8 lg:p-12 lg:sticky lg:top-16 lg:h-fit flex flex-col space-y-12">
+  <div class="flex items-start justify-between gap-6 lg:block">
+    <div class="flex flex-col space-y-6 min-w-0">
+      <div class="w-24 h-24 bg-surface-container-highest overflow-hidden rounded-sm">
+        <img alt="whyself" class="w-full h-full object-cover" decoding="async" height="96" loading="lazy" src={`${base}images/profile-avatar.jpg`} width="96" />
       </div>
-      <nav class="mt-5 flex flex-col gap-3 font-body italic text-lg lg:hidden">
-        <a class={navClass('home')} href={base}><span>Home</span></a>
-        <a class={navClass('bio')} href={`${base}bio/`}><span>Bio</span></a>
-        <a class={navClass('about')} href={`${base}about/`}><span>About</span></a>
-      </nav>
+      <div>
+        <h2 class="font-headline font-black uppercase text-sm tracking-widest text-on-surface">whyself</h2>
+        <p class="font-body italic text-lg text-secondary">Racing with death.</p>
+        <div class="mt-4 flex items-center gap-2 text-outline">
+          <a
+            aria-label="GitHub"
+            class="hover:text-on-surface transition-colors duration-200"
+            href="https://github.com/whyself"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <svg aria-hidden="true" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.9.58.11.79-.25.79-.56v-1.97c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.74 2.67 1.24 3.33.95.1-.74.4-1.24.73-1.53-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.73 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.28 5.69.41.36.78 1.07.78 2.16v3.19c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+            </svg>
+          </a>
+          <a aria-label="Email" class="hover:text-on-surface transition-colors duration-200" href="mailto:251502023@smail.nju.edu.cn">
+            <svg aria-hidden="true" class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24">
+              <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+              <path d="m22 8-10 7L2 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
+    <nav class="flex flex-col gap-3 font-body italic text-lg shrink-0 lg:hidden">
+      <a class={navClass('home')} href={base}><span>Home</span></a>
+      <a class={navClass('bio')} href={`${base}bio/`}><span>Bio</span></a>
+      <a class={navClass('about')} href={`${base}about/`}><span>About</span></a>
+    </nav>
   </div>
   <nav class="hidden lg:flex flex-col space-y-6 font-body italic text-xl">
     <a class={navClass('home')} href={base}><span>Home</span></a>
