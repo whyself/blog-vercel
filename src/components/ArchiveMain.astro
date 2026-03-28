@@ -8,9 +8,7 @@ import ScrollTopButton from './ScrollTopButton.astro';
 import SiteFooter from './SiteFooter.astro';
 import TopActions from './TopActions.astro';
 import { recommendedReads } from '../data/recommended-reads';
-import type { SearchItem } from '../utils/posts';
-
-type MajorRoute = 'all' | 'articles' | 'books' | 'shows-and-movies';
+import type { MajorRoute, SearchItem } from '../utils/posts';
 
 interface Props {
   posts: CollectionEntry<'posts'>[];
@@ -32,6 +30,7 @@ const {
 
 const routeRoot = majorRoute === 'all' ? base : `${base}${majorRoute}/`;
 const pageHref = (page: number) => (page <= 1 ? routeRoot : `${routeRoot}page/${page}/`);
+const archiveDataUrl = `${base}archive-data/${majorRoute}.json`;
 const navItems: Array<{ key: MajorRoute; label: string; href: string }> = [
   { key: 'all', label: 'All Posts', href: base },
   { key: 'articles', label: 'Articles', href: `${base}articles/` },
@@ -42,6 +41,12 @@ const navClass = (active: boolean) =>
   active
     ? 'font-label font-bold text-xs uppercase tracking-widest text-primary border-b-2 border-primary pb-4 whitespace-nowrap'
     : 'font-label font-bold text-xs uppercase tracking-widest text-outline hover:text-primary pb-4 transition-colors whitespace-nowrap';
+
+const resolveHref = (href: string) => {
+  if (/^https?:\/\//i.test(href)) return href;
+  if (href.startsWith('/')) return `${base}${href.slice(1)}`;
+  return href;
+};
 ---
 
 <body class="bg-surface text-on-surface selection:bg-primary-container selection:text-white">
@@ -61,29 +66,23 @@ const navClass = (active: boolean) =>
 ))}
 </div>
 </div>
-<nav class="mb-3 flex items-center justify-between pb-2">
-{currentPage > 1 ? (
-  <a class="font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 text-outline hover:text-primary transition-colors" href={pageHref(currentPage - 1)}>
+<nav class="mb-3 flex items-center justify-between pb-2" data-pagination-nav data-route-root={routeRoot} data-page-size="10" data-initial-page={currentPage} data-total-pages={totalPages} data-archive-data-url={archiveDataUrl}>
+  <a
+    class={`font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 transition-colors ${currentPage > 1 ? 'text-outline hover:text-primary' : 'text-outline opacity-40 cursor-not-allowed pointer-events-none'}`}
+    data-page-prev
+    href={pageHref(currentPage > 1 ? currentPage - 1 : 1)}
+  >
     <Icon class="w-4 h-4" name="arrow_back" />
     <span>Previous</span>
   </a>
-) : (
-  <span class="font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 text-outline opacity-40 cursor-not-allowed">
-    <Icon class="w-4 h-4" name="arrow_back" />
-    <span>Previous</span>
-  </span>
-)}
-{currentPage < totalPages ? (
-  <a class="font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 text-outline hover:text-primary transition-colors" href={pageHref(currentPage + 1)}>
+  <a
+    class={`font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 transition-colors ${currentPage < totalPages ? 'text-outline hover:text-primary' : 'text-outline opacity-40 cursor-not-allowed pointer-events-none'}`}
+    data-page-next
+    href={pageHref(currentPage < totalPages ? currentPage + 1 : totalPages)}
+  >
     <span>Next</span>
     <Icon class="w-4 h-4" name="arrow_forward" />
   </a>
-) : (
-  <span class="font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 text-outline opacity-40 cursor-not-allowed">
-    <span>Next</span>
-    <Icon class="w-4 h-4" name="arrow_forward" />
-  </span>
-)}
 </nav>
 <div class="space-y-16" id="post-list-top">
 {posts.map((post) => {
@@ -91,7 +90,7 @@ const navClass = (active: boolean) =>
   const title = post.data.listTitle ?? post.data.title;
   const tagData = post.data.tags.join("||");
   return (
-    <article class="group cursor-pointer" data-post-card="" data-tags={tagData}>
+    <article class="group cursor-pointer" data-post-card="" data-tags={tagData} data-list-date={post.data.listDate} data-word-count={post.data.wordCount}>
       {post.data.thumbnail ? (
         <div class="flex flex-col md:flex-row md:items-start gap-8">
           <div class="flex-1 space-y-4 order-2 md:order-1">
@@ -139,7 +138,7 @@ const navClass = (active: boolean) =>
 })}
 </div>
 <nav class="mt-24 flex items-center justify-center border-t border-surface-container-high pt-12">
-<div class="flex space-x-6 font-label font-bold text-xs">
+<div class="flex space-x-6 font-label font-bold text-xs" data-page-number-list>
 {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) =>
   pageNum === currentPage ? (
     <span class="text-primary border-b border-primary">{String(pageNum).padStart(2, "0")}</span>
@@ -157,18 +156,22 @@ const navClass = (active: boolean) =>
 <div class="mt-16">
 <h4 class="font-headline font-black uppercase text-[10px] tracking-[0.3em] mb-8 text-on-surface">Recent Picks</h4>
 <ul class="space-y-6 font-body italic text-lg text-on-surface-variant">
-{recommendedReads.map((item) => (
-  <li class="leading-snug">
-    <a
-      class="hover:text-primary transition-colors"
-      href={item.href}
-      rel={/^https?:\/\//i.test(item.href) ? 'noopener noreferrer' : undefined}
-      target={/^https?:\/\//i.test(item.href) ? '_blank' : undefined}
-    >
-      {item.title}
-    </a>
-  </li>
-))}
+{recommendedReads.map((item) => {
+  const href = resolveHref(item.href);
+  const isExternal = /^https?:\/\//i.test(href);
+  return (
+    <li class="leading-snug">
+      <a
+        class="hover:text-primary transition-colors"
+        href={href}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+        target={isExternal ? '_blank' : undefined}
+      >
+        {item.title}
+      </a>
+    </li>
+  );
+})}
 </ul>
 </div>
 </aside>
@@ -177,35 +180,177 @@ const navClass = (active: boolean) =>
 <ScrollTopButton />
 <script is:inline>
   (() => {
+    const cardsRoot = document.getElementById("post-list-top");
     const cards = Array.from(document.querySelectorAll("[data-post-card]"));
     const tagContainer = document.getElementById("tag-filters");
-    if (!cards.length || !tagContainer) return;
+    const paginationNav = document.querySelector("[data-pagination-nav]");
+    if (!cards.length || !cardsRoot || !tagContainer || !paginationNav) return;
+
+    const pageNumbersRoot = paginationNav.parentElement?.querySelector("[data-page-number-list]");
+    const prevLink = paginationNav.querySelector("[data-page-prev]");
+    const nextLink = paginationNav.querySelector("[data-page-next]");
+    if (!(prevLink instanceof HTMLAnchorElement) || !(nextLink instanceof HTMLAnchorElement) || !(pageNumbersRoot instanceof HTMLElement)) return;
 
     const tagSelectedClass = "px-5 py-2.5 bg-primary text-on-primary text-[10px] font-bold uppercase tracking-[0.15em] rounded-full shadow-sm";
     const tagUnselectedClass = "px-5 py-2.5 border border-surface-container-highest text-on-surface-variant hover:border-primary hover:text-primary transition-all text-[10px] font-bold uppercase tracking-[0.15em] rounded-full";
-    const state = { tag: "all" };
+    const routeRoot = paginationNav.getAttribute("data-route-root") || "/";
+    const archiveDataUrl = paginationNav.getAttribute("data-archive-data-url") || "";
+    const pageSize = Number(paginationNav.getAttribute("data-page-size") || "10");
+    const initialPage = Number(paginationNav.getAttribute("data-initial-page") || "1");
+    const initialTotalPages = Number(paginationNav.getAttribute("data-total-pages") || "1");
+    const state = { tag: "all", page: Math.max(1, initialPage), loaded: false, items: [] };
+    const pageHref = (page) => (page <= 1 ? routeRoot : `${routeRoot}page/${page}/`);
 
-    const getTags = (card) => (card.getAttribute("data-tags") || "").split("||").filter(Boolean);
+    const parseDomCard = (card) => {
+      const titleAnchor = card.querySelector("h3 a");
+      const title = titleAnchor?.textContent?.trim() || "";
+      const href = titleAnchor?.getAttribute("href") || "#";
+      const excerpt = card.querySelector("p")?.textContent?.trim() || "";
+      const listDate = card.getAttribute("data-list-date") || "";
+      const wordCount = card.getAttribute("data-word-count") || "";
+      const tags = (card.getAttribute("data-tags") || "").split("||").filter(Boolean);
+      const thumbnail = card.querySelector("img")?.getAttribute("src") || "";
+      return { title, href, excerpt, listDate, wordCount, tags, thumbnail };
+    };
 
-    const getAvailableTags = () => {
-      const tagSet = new Set();
-      cards.forEach((card) => {
-        getTags(card).forEach((tag) => tagSet.add(tag));
-      });
-      return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+    const escapeHtml = (value) =>
+      String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+
+    const renderCardHtml = (item) => {
+      const tagsMarkup = (item.tags || [])
+        .map((tag) => `<span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">${escapeHtml(tag)}</span>`)
+        .join("");
+      const title = escapeHtml(item.title || "");
+      const detailHref = escapeHtml(item.href || "#");
+      const excerpt = escapeHtml(item.excerpt || "");
+      const listDate = escapeHtml(item.listDate || "");
+      const wordCount = escapeHtml(item.wordCount || "");
+      const tagData = escapeHtml((item.tags || []).join("||"));
+
+      if (item.thumbnail) {
+        return `<article class="group cursor-pointer" data-post-card="" data-tags="${tagData}">
+      <div class="flex flex-col md:flex-row md:items-start gap-8">
+        <div class="flex-1 space-y-4 order-2 md:order-1">
+          <div class="flex items-center space-x-4">
+            <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">${listDate}</span>
+            <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+            <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">${wordCount}</span>
+          </div>
+          <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
+            <a href="${detailHref}" class="hover:opacity-80 transition-opacity">${title}</a>
+          </h3>
+          <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">${excerpt}</p>
+          <div class="flex space-x-2 pt-2">${tagsMarkup}</div>
+        </div>
+        <div class="w-full md:w-48 h-48 bg-surface-container shrink-0 order-1 md:order-2 overflow-hidden">
+          <img alt="${title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" decoding="async" height="192" loading="lazy" src="${escapeHtml(item.thumbnail)}" width="192"/>
+        </div>
+      </div>
+    </article>`;
+      }
+
+      return `<article class="group cursor-pointer" data-post-card="" data-tags="${tagData}">
+      <div class="flex flex-col md:flex-row md:items-start gap-8">
+        <div class="flex-1 space-y-4">
+          <div class="flex items-center space-x-4">
+            <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">${listDate}</span>
+            <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+            <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">${wordCount}</span>
+          </div>
+          <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
+            <a href="${detailHref}">${title}</a>
+          </h3>
+          <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">${excerpt}</p>
+          <div class="flex space-x-2 pt-2">${tagsMarkup}</div>
+        </div>
+      </div>
+    </article>`;
+    };
+
+    const loadArchiveItems = async () => {
+      if (state.loaded) return state.items;
+      if (!archiveDataUrl) return state.items;
+      try {
+        const response = await fetch(archiveDataUrl, { credentials: "same-origin" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        if (!Array.isArray(payload)) throw new Error("Invalid payload");
+        state.items = payload;
+        state.loaded = true;
+      } catch {
+        state.items = cards.map((card) => parseDomCard(card));
+        state.loaded = true;
+      }
+      return state.items;
+    };
+
+    const getWorkingItems = () => (state.loaded ? state.items : cards.map((card) => parseDomCard(card)));
+
+    const getFilteredItems = () =>
+      getWorkingItems().filter((item) => state.tag === "all" || (item.tags || []).includes(state.tag));
+
+    const getTotalPages = (filteredItems) => Math.max(1, Math.ceil(filteredItems.length / pageSize));
+
+    const updatePager = (totalPages) => {
+      const atFirst = state.page <= 1;
+      const atLast = state.page >= totalPages;
+      const setNavState = (el, disabled, page) => {
+        el.href = pageHref(page);
+        el.classList.toggle("opacity-40", disabled);
+        el.classList.toggle("cursor-not-allowed", disabled);
+        el.classList.toggle("pointer-events-none", disabled);
+      };
+
+      setNavState(prevLink, atFirst, atFirst ? 1 : state.page - 1);
+      setNavState(nextLink, atLast, atLast ? totalPages : state.page + 1);
+
+      pageNumbersRoot.innerHTML = "";
+      for (let page = 1; page <= totalPages; page += 1) {
+        if (page === state.page) {
+          const active = document.createElement("span");
+          active.className = "text-primary border-b border-primary";
+          active.textContent = String(page).padStart(2, "0");
+          pageNumbersRoot.appendChild(active);
+          continue;
+        }
+        const link = document.createElement("a");
+        link.className = "text-outline hover:text-primary transition-colors";
+        link.href = pageHref(page);
+        link.textContent = String(page).padStart(2, "0");
+        link.addEventListener("click", (event) => {
+          if (!state.loaded) return;
+          event.preventDefault();
+          state.page = page;
+          applyFilters();
+        });
+        pageNumbersRoot.appendChild(link);
+      }
     };
 
     const applyFilters = () => {
-      cards.forEach((card) => {
-        const tags = getTags(card);
-        const tagMatch = state.tag === "all" || tags.includes(state.tag);
-        card.hidden = !tagMatch;
-      });
+      const filteredItems = getFilteredItems();
+      const totalPages = getTotalPages(filteredItems);
+      if (state.page > totalPages) state.page = totalPages;
+      if (state.page < 1) state.page = 1;
+
+      const start = (state.page - 1) * pageSize;
+      const end = start + pageSize;
+      const pageItems = filteredItems.slice(start, end);
+      cardsRoot.innerHTML = pageItems.map((item) => renderCardHtml(item)).join("");
+
       renderTagButtons();
+      updatePager(totalPages);
     };
 
     const renderTagButtons = () => {
-      const tags = getAvailableTags();
+      const tagSet = new Set();
+      getWorkingItems().forEach((item) => (item.tags || []).forEach((tag) => tagSet.add(tag)));
+      const tags = Array.from(tagSet).sort((a, b) => a.localeCompare(b));
       if (state.tag !== "all" && !tags.includes(state.tag)) state.tag = "all";
       tagContainer.innerHTML = "";
 
@@ -215,8 +360,10 @@ const navClass = (active: boolean) =>
         btn.dataset.tagFilter = value;
         btn.className = active ? tagSelectedClass : tagUnselectedClass;
         btn.textContent = label;
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", async () => {
           state.tag = value;
+          state.page = 1;
+          await loadArchiveItems();
           applyFilters();
         });
         return btn;
@@ -226,7 +373,28 @@ const navClass = (active: boolean) =>
       tags.forEach((tag) => tagContainer.appendChild(buildTagButton(tag, tag, state.tag === tag)));
     };
 
-    applyFilters();
+    prevLink.addEventListener("click", (event) => {
+      if (!state.loaded) return;
+      event.preventDefault();
+      if (state.page <= 1) return;
+      state.page -= 1;
+      applyFilters();
+    });
+
+    nextLink.addEventListener("click", (event) => {
+      if (!state.loaded) return;
+      event.preventDefault();
+      const totalPages = getTotalPages(getFilteredItems());
+      if (state.page >= totalPages) return;
+      state.page += 1;
+      applyFilters();
+    });
+
+    renderTagButtons();
+    updatePager(Math.max(1, initialTotalPages));
+    loadArchiveItems().then(() => {
+      renderTagButtons();
+    });
   })();
 </script>
 <InitialViewportScript />

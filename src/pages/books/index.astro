@@ -1,39 +1,25 @@
----
-import ArchiveMain from '../../components/ArchiveMain.astro';
-import PageHead from '../../components/PageHead.astro';
-import { buildSearchItems, getPublishedPosts, sortPostsByDateDesc } from '../../utils/posts';
+﻿---
+import ArchivePageDocument from '../../components/ArchivePageDocument.astro';
+import { ARCHIVE_PAGE_SIZE, buildArchiveSearchItems, getArchivePostsByRoute, getArchiveSeo, getTotalPages, paginatePosts } from '../../utils/archive';
 
-const PAGE_SIZE = 10;
 const base = import.meta.env.BASE_URL;
-const allPosts = sortPostsByDateDesc(await getPublishedPosts());
-const bookPosts = allPosts.filter((post) => post.data.majorCategory === 'Books');
-const posts = bookPosts.slice(0, PAGE_SIZE);
-const totalPages = Math.max(1, Math.ceil(bookPosts.length / PAGE_SIZE));
+const { allPosts, routePosts } = await getArchivePostsByRoute('books');
+const posts = paginatePosts(routePosts, 1, ARCHIVE_PAGE_SIZE);
+const totalPages = getTotalPages(routePosts, ARCHIVE_PAGE_SIZE);
 const currentPage = 1;
-const searchPosts = buildSearchItems(allPosts, base);
+const searchPosts = buildArchiveSearchItems(allPosts, base);
 const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
-const seoTitle = 'Books | whyself';
-const seoDescription = 'Book archive by whyself.';
-const canonicalUrl = new URL(`${base}books/`, siteOrigin).toString();
-const ogImageUrl = new URL(`${base}images/hero/blog-hero-light-1920.webp`, siteOrigin).toString();
+const { seoTitle, seoDescription, canonicalUrl, ogImageUrl } = getArchiveSeo('books', currentPage, base, siteOrigin);
 ---
-<!DOCTYPE html>
-<html class="light" lang="en">
-<head>
-<PageHead
+<ArchivePageDocument
   base={base}
-  title={seoTitle}
-  description={seoDescription}
+  posts={posts}
+  searchItems={searchPosts}
+  currentPage={currentPage}
+  totalPages={totalPages}
+  majorRoute="books"
+  seoTitle={seoTitle}
+  seoDescription={seoDescription}
   canonicalUrl={canonicalUrl}
-  ogType="website"
   ogImageUrl={ogImageUrl}
-  twitterCard="summary_large_image"
 />
-<style>
-        body { font-family: 'Inter', sans-serif; }
-        .serif-text { font-family: 'Newsreader', serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<ArchiveMain posts={posts} searchItems={searchPosts} base={base} currentPage={currentPage} totalPages={totalPages} majorRoute="books" />
-</html>

@@ -9,6 +9,8 @@ export interface SearchItem {
   excerpt?: string;
 }
 
+export type MajorRoute = 'all' | 'articles' | 'books' | 'shows-and-movies';
+
 export async function getPublishedPosts(): Promise<PostEntry[]> {
   return getCollection('posts', ({ data }) => !data.draft);
 }
@@ -28,4 +30,16 @@ export function buildSearchItems(posts: PostEntry[], base: string): SearchItem[]
     tags: entry.data.tags ?? [],
     excerpt: entry.data.excerpt ?? '',
   }));
+}
+
+export function filterPostsByMajorRoute(posts: PostEntry[], route: MajorRoute): PostEntry[] {
+  if (route === 'all') return posts;
+
+  const majorCategoryByRoute = {
+    articles: 'Articles',
+    books: 'Books',
+    'shows-and-movies': 'Shows and Movies',
+  } as const;
+
+  return posts.filter((post) => post.data.majorCategory === majorCategoryByRoute[route]);
 }

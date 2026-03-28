@@ -1,61 +1,34 @@
----
-import ArchiveMain from '../../../components/ArchiveMain.astro';
-import PageHead from '../../../components/PageHead.astro';
-import { buildSearchItems, getPublishedPosts, sortPostsByDateDesc } from '../../../utils/posts';
+﻿---
+import ArchivePageDocument from '../../../components/ArchivePageDocument.astro';
+import { ARCHIVE_PAGE_SIZE, buildArchiveSearchItems, buildArchiveStaticPaths, getArchivePostsByRoute, getArchiveSeo } from '../../../utils/archive';
+import type { PostEntry } from '../../../utils/posts';
 
 export async function getStaticPaths() {
-  const PAGE_SIZE = 10;
-  const allPosts = sortPostsByDateDesc(await getPublishedPosts());
-  const posts = allPosts.filter((post) => post.data.majorCategory === 'Articles');
-  const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
-
-  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, idx) => {
-    const page = idx + 2;
-    const start = (page - 1) * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-    return {
-      params: { page: String(page) },
-      props: {
-        currentPage: page,
-        totalPages,
-        posts: posts.slice(start, end),
-      },
-    };
-  });
+  const { routePosts } = await getArchivePostsByRoute('articles');
+  return buildArchiveStaticPaths(routePosts, ARCHIVE_PAGE_SIZE);
 }
 
 const { currentPage, totalPages, posts } = Astro.props as {
   currentPage: number;
   totalPages: number;
-  posts: Awaited<ReturnType<typeof getPublishedPosts>>;
+  posts: PostEntry[];
 };
 
 const base = import.meta.env.BASE_URL;
-const allPosts = sortPostsByDateDesc(await getPublishedPosts());
-const searchPosts = buildSearchItems(allPosts, base);
+const { allPosts } = await getArchivePostsByRoute('articles');
+const searchPosts = buildArchiveSearchItems(allPosts, base);
 const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
-const seoTitle = `Articles - Page ${currentPage} | whyself`;
-const seoDescription = `Article archive page ${currentPage} on whyself.`;
-const canonicalUrl = new URL(`${base}articles/page/${currentPage}/`, siteOrigin).toString();
-const ogImageUrl = new URL(`${base}images/hero/blog-hero-light-1920.webp`, siteOrigin).toString();
+const { seoTitle, seoDescription, canonicalUrl, ogImageUrl } = getArchiveSeo('articles', currentPage, base, siteOrigin);
 ---
-<!DOCTYPE html>
-<html class="light" lang="en">
-<head>
-<PageHead
+<ArchivePageDocument
   base={base}
-  title={seoTitle}
-  description={seoDescription}
+  posts={posts}
+  searchItems={searchPosts}
+  currentPage={currentPage}
+  totalPages={totalPages}
+  majorRoute="articles"
+  seoTitle={seoTitle}
+  seoDescription={seoDescription}
   canonicalUrl={canonicalUrl}
-  ogType="website"
   ogImageUrl={ogImageUrl}
-  twitterCard="summary_large_image"
 />
-<style>
-        body { font-family: 'Inter', sans-serif; }
-        .serif-text { font-family: 'Newsreader', serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<ArchiveMain posts={posts} searchItems={searchPosts} base={base} currentPage={currentPage} totalPages={totalPages} majorRoute="articles" />
-</html>

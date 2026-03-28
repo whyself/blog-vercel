@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ArchiveMain from './ArchiveMain.astro';
+import PageHead from './PageHead.astro';
+import type { MajorRoute, SearchItem } from '../utils/posts';
+
+interface Props {
+  base: string;
+  posts: CollectionEntry<'posts'>[];
+  searchItems: SearchItem[];
+  currentPage: number;
+  totalPages: number;
+  majorRoute: MajorRoute;
+  seoTitle: string;
+  seoDescription: string;
+  canonicalUrl: string;
+  ogImageUrl: string;
+}
+
+const {
+  base,
+  posts,
+  searchItems,
+  currentPage,
+  totalPages,
+  majorRoute,
+  seoTitle,
+  seoDescription,
+  canonicalUrl,
+  ogImageUrl,
+} = Astro.props as Props;
+---
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<PageHead
+  base={base}
+  title={seoTitle}
+  description={seoDescription}
+  canonicalUrl={canonicalUrl}
+  ogType="website"
+  ogImageUrl={ogImageUrl}
+  twitterCard="summary_large_image"
+/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .serif-text { font-family: 'Newsreader', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<ArchiveMain
+  posts={posts}
+  searchItems={searchItems}
+  base={base}
+  currentPage={currentPage}
+  totalPages={totalPages}
+  majorRoute={majorRoute}
+/>
+</html>
