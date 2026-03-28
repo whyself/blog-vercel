@@ -5,9 +5,10 @@ interface Props {
   behavior?: 'auto' | 'smooth';
   delayMs?: number;
   durationMs?: number;
+  startOn?: 'domcontentloaded' | 'load';
 }
 
-const { selector = '[data-content-start]', offsetRatio = 0.22, behavior = 'auto', delayMs = 0, durationMs = 600 } = Astro.props as Props;
+const { selector = '[data-content-start]', offsetRatio = 0.22, behavior = 'auto', delayMs = 0, durationMs = 600, startOn = 'domcontentloaded' } = Astro.props as Props;
 
 const script = `(() => {
   const contentStart = document.querySelector(${JSON.stringify(selector)});
@@ -56,10 +57,15 @@ const script = `(() => {
     history.scrollRestoration = "manual";
   }
 
-  if (document.readyState !== "loading") {
+  const startEvent = ${JSON.stringify(startOn)};
+  const shouldStartImmediately =
+    (startEvent === "domcontentloaded" && document.readyState !== "loading") ||
+    (startEvent === "load" && document.readyState === "complete");
+
+  if (shouldStartImmediately) {
     window.setTimeout(scheduleInitialViewportPosition, ${delayMs});
   } else {
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener(startEvent === "load" ? "load" : "DOMContentLoaded", () => {
       window.setTimeout(scheduleInitialViewportPosition, ${delayMs});
     }, { once: true });
   }
