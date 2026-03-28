@@ -15,6 +15,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@astrojs/netlify": "^6.6.5",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0"

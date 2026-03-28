@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import netlify from '@astrojs/netlify';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
@@ -9,6 +10,8 @@ const base = process.env.BASE_PATH || '/';
 export default defineConfig({
   site,
   base,
+  adapter: netlify(),
+  output: 'server',
   markdown: {
     remarkPlugins: [remarkMath, remarkGfm],
     rehypePlugins: [rehypeKatex],
