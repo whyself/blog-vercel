@@ -69,7 +69,9 @@ const script = `(() => {
       window.setTimeout(scheduleInitialViewportPosition, ${delayMs});
     }, { once: true });
   }
-  window.addEventListener("pageshow", scheduleInitialViewportPosition);
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) scheduleInitialViewportPosition();
+  });
 })();`;
 ---
 
