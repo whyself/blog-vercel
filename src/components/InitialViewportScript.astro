@@ -4,74 +4,40 @@ interface Props {
   offsetRatio?: number;
   behavior?: 'auto' | 'smooth';
   delayMs?: number;
-  durationMs?: number;
-  startOn?: 'domcontentloaded' | 'load';
 }
 
-const { selector = '[data-content-start]', offsetRatio = 0.22, behavior = 'auto', delayMs = 0, durationMs = 600, startOn = 'domcontentloaded' } = Astro.props as Props;
+const {
+  selector = '[data-content-start]',
+  offsetRatio = 0.22,
+  behavior = 'smooth',
+  delayMs = 120,
+} = Astro.props as Props;
 
 const script = `(() => {
   const contentStart = document.querySelector(${JSON.stringify(selector)});
   if (!contentStart) return;
 
-  const applyInitialViewportPosition = () => {
+  const run = () => {
     if (window.location.hash) return;
     const navigationType = performance.getEntriesByType("navigation")?.[0]?.type;
     if (navigationType === "back_forward") return;
+
     const contentTop = contentStart.getBoundingClientRect().top + window.scrollY;
     const targetTop = Math.max(0, Math.round(contentTop - window.innerHeight * ${offsetRatio}));
     const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const resolvedBehavior = prefersReducedMotion ? "auto" : ${JSON.stringify(behavior)};
-    if (resolvedBehavior !== "smooth") {
-      window.scrollTo({ top: targetTop, behavior: "auto" });
-      return;
-    }
-
-    const startTop = window.scrollY;
-    const delta = targetTop - startTop;
-    if (Math.abs(delta) < 2) return;
-    const duration = Math.max(0, ${durationMs});
-    if (duration <= 0) {
-      window.scrollTo({ top: targetTop, behavior: "auto" });
-      return;
-    }
-    const startTs = performance.now();
-    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-    const tick = (now) => {
-      const elapsed = now - startTs;
-      const progress = Math.min(1, elapsed / duration);
-      const eased = easeOutCubic(progress);
-      window.scrollTo({ top: startTop + delta * eased, behavior: "auto" });
-      if (progress < 1) window.requestAnimationFrame(tick);
-    };
-    window.requestAnimationFrame(tick);
-  };
-
-  const scheduleInitialViewportPosition = () => {
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(applyInitialViewportPosition);
-    });
+    window.scrollTo({ top: targetTop, behavior: resolvedBehavior });
   };
 
   if ("scrollRestoration" in history) {
     history.scrollRestoration = "manual";
   }
 
-  const startEvent = ${JSON.stringify(startOn)};
-  const shouldStartImmediately =
-    (startEvent === "domcontentloaded" && document.readyState !== "loading") ||
-    (startEvent === "load" && document.readyState === "complete");
-
-  if (shouldStartImmediately) {
-    window.setTimeout(scheduleInitialViewportPosition, ${delayMs});
-  } else {
-    window.addEventListener(startEvent === "load" ? "load" : "DOMContentLoaded", () => {
-      window.setTimeout(scheduleInitialViewportPosition, ${delayMs});
-    }, { once: true });
-  }
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) scheduleInitialViewportPosition();
-  });
+  window.addEventListener("load", () => {
+    window.setTimeout(() => {
+      window.requestAnimationFrame(run);
+    }, ${delayMs});
+  }, { once: true });
 })();`;
 ---
 
