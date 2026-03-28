@@ -1,7 +1,7 @@
 ﻿---
 import ArchivePageDocument from '../../../components/ArchivePageDocument.astro';
-import { ARCHIVE_PAGE_SIZE, buildArchiveSearchItems, buildArchiveStaticPaths, getArchivePostsByRoute, getArchiveSeo } from '../../../utils/archive';
-import type { PostEntry } from '../../../utils/posts';
+import { ARCHIVE_PAGE_SIZE, buildArchiveStaticPaths, getArchivePostsByRoute, getArchiveSeo } from '../../../utils/archive';
+import { buildSearchItems, type PostEntry } from '../../../utils/posts';
 
 export async function getStaticPaths() {
   const { routePosts } = await getArchivePostsByRoute('articles');
@@ -16,7 +16,7 @@ const { currentPage, totalPages, posts } = Astro.props as {
 
 const base = import.meta.env.BASE_URL;
 const { allPosts } = await getArchivePostsByRoute('articles');
-const searchPosts = buildArchiveSearchItems(allPosts, base);
+const searchPosts = buildSearchItems(allPosts, base);
 const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
 const { seoTitle, seoDescription, canonicalUrl, ogImageUrl } = getArchiveSeo('articles', currentPage, base, siteOrigin);
 ---

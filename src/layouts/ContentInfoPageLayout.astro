@@ -7,6 +7,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 import TopActions from '../components/TopActions.astro';
 import PageHead from '../components/PageHead.astro';
 import type { SearchItem } from '../utils/posts';
+import '../styles/article-prose-base.css';
 
 interface Props {
   base: string;
@@ -49,33 +50,6 @@ const {
   />
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .article-body { font-family: 'Newsreader', serif; color: #1f2937; line-height: 1.8; font-size: 1.05rem; }
-    .article-body :global(h1), .article-body :global(h2), .article-body :global(h3), .article-body :global(h4) { font-family: 'Inter', sans-serif; font-weight: 800; margin: 1.1em 0 0.5em; color: #111827; }
-    .article-body :global(p) { margin: 0.75em 0; }
-    .article-body :global(ul), .article-body :global(ol) { margin: 0.85em 0 1.15em; padding-left: 1.45em; }
-    .article-body :global(ul) { list-style: disc; }
-    .article-body :global(ol) { list-style: decimal; }
-    .article-body :global(li) { margin: 0.32em 0; padding-left: 0.1em; display: list-item; }
-    .article-body :global(li::marker) { color: #4b5563; font-size: 0.95em; }
-    .article-body :global(li > ul), .article-body :global(li > ol) { margin-top: 0.45em; margin-bottom: 0.5em; }
-    .article-body :global(blockquote) { color: #4b5563; border-left: 3px solid #d0d7de; padding-left: 0.9em; margin: 0.95em 0; }
-    .article-body :global(a) { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #9ca3af; transition: color 0.15s ease; }
-    .article-body :global(a:hover) { color: #111827; text-decoration-color: #111827; }
-    .article-body :global(strong) { font-weight: 700; color: #111827; }
-    .article-body :global(code) { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.84em; font-weight: 500; letter-spacing: 0.01em; color: #374151; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 0.3rem; padding: 0.08em 0.42em; }
-    .article-body :global(hr) { border: none; border-top: 1px solid #e5e7eb; margin: 1.55em 0; }
-    :global(html.dark) .article-body { color: #d7e2ee; }
-    :global(html.dark) .article-body :global(h1),
-    :global(html.dark) .article-body :global(h2),
-    :global(html.dark) .article-body :global(h3),
-    :global(html.dark) .article-body :global(h4) { color: #f3f7fd; }
-    :global(html.dark) .article-body :global(li::marker) { color: #a5b4c6; }
-    :global(html.dark) .article-body :global(blockquote) { color: #b5c3d4; border-left-color: #46556a; }
-    :global(html.dark) .article-body :global(a) { color: #dbe7f7; text-decoration-color: #6f8097; }
-    :global(html.dark) .article-body :global(a:hover) { color: #ffffff; text-decoration-color: #ffffff; }
-    :global(html.dark) .article-body :global(strong) { color: #f7fbff; }
-    :global(html.dark) .article-body :global(code) { color: #adbac7; background: #2d333b; border-color: #444c56; }
-    :global(html.dark) .article-body :global(hr) { border-top-color: #374151; }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-container selection:text-white">

@@ -19,10 +19,6 @@ export function sortPostsByDateDesc(posts: PostEntry[]): PostEntry[] {
   return [...posts].sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 }
 
-export function sortPostsByDateAsc(posts: PostEntry[]): PostEntry[] {
-  return [...posts].sort((a, b) => a.data.publishDate.valueOf() - b.data.publishDate.valueOf());
-}
-
 export function buildSearchItems(posts: PostEntry[], base: string): SearchItem[] {
   return sortPostsByDateDesc(posts).map((entry) => ({
     title: entry.data.listTitle ?? entry.data.title,

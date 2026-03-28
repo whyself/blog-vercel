@@ -1,4 +1,4 @@
-import { buildSearchItems, filterPostsByMajorRoute, getPublishedPosts, sortPostsByDateDesc, type MajorRoute, type SearchItem, type PostEntry } from './posts';
+import { filterPostsByMajorRoute, getPublishedPosts, sortPostsByDateDesc, type MajorRoute, type PostEntry } from './posts';
 
 export const ARCHIVE_PAGE_SIZE = 10;
 
@@ -89,8 +89,4 @@ export function getArchiveSeo(route: MajorRoute, currentPage: number, base: stri
     canonicalUrl: new URL(`${base}${canonicalPath}`, siteOrigin).toString(),
     ogImageUrl: new URL(`${base}images/hero/blog-hero-light-1920.webp`, siteOrigin).toString(),
   };
-}
-
-export function buildArchiveSearchItems(posts: PostEntry[], base: string): SearchItem[] {
-  return buildSearchItems(posts, base);
 }

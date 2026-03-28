@@ -212,6 +212,7 @@ const resolveHref = (href: string) => {
       const thumbnail = card.querySelector("img")?.getAttribute("src") || "";
       return { title, href, excerpt, listDate, wordCount, tags, thumbnail };
     };
+    const domItems = cards.map((card) => parseDomCard(card));
 
     const escapeHtml = (value) =>
       String(value)
@@ -283,13 +284,13 @@ const resolveHref = (href: string) => {
         state.items = payload;
         state.loaded = true;
       } catch {
-        state.items = cards.map((card) => parseDomCard(card));
+        state.items = domItems;
         state.loaded = true;
       }
       return state.items;
     };
 
-    const getWorkingItems = () => (state.loaded ? state.items : cards.map((card) => parseDomCard(card)));
+    const getWorkingItems = () => (state.loaded ? state.items : domItems);
 
     const getFilteredItems = () =>
       getWorkingItems().filter((item) => state.tag === "all" || (item.tags || []).includes(state.tag));
@@ -363,7 +364,9 @@ const resolveHref = (href: string) => {
         btn.addEventListener("click", async () => {
           state.tag = value;
           state.page = 1;
-          await loadArchiveItems();
+          if (value !== "all") {
+            await loadArchiveItems();
+          }
           applyFilters();
         });
         return btn;
@@ -392,9 +395,6 @@ const resolveHref = (href: string) => {
 
     renderTagButtons();
     updatePager(Math.max(1, initialTotalPages));
-    loadArchiveItems().then(() => {
-      renderTagButtons();
-    });
   })();
 </script>
 <InitialViewportScript />
