@@ -1,0 +1,225 @@
+﻿---
+interface SearchItem {
+  title: string;
+  href: string;
+  tags?: string[];
+  excerpt?: string;
+}
+
+const { searchItems = [] } = Astro.props as { searchItems?: SearchItem[] };
+const base = import.meta.env.BASE_URL;
+---
+
+<header class="fixed top-8 right-8 z-[120] bg-transparent" data-search-items={encodeURIComponent(JSON.stringify(searchItems))} id="top-actions-root">
+  <div class="flex items-start space-x-4">
+    <div class="relative">
+      <button class="transition-opacity hover:opacity-70 flex items-center" id="header-search-toggle" type="button">
+        <span class="material-symbols-outlined text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">search</span>
+      </button>
+      <div class="hidden absolute right-0 md:right-[calc(100%+0.75rem)] top-[calc(100%+0.5rem)] md:top-1/2 md:-translate-y-1/2 w-[min(20rem,calc(100vw-2.5rem))] md:w-80 z-[130] opacity-0 pointer-events-none translate-x-2 transition-all duration-200 ease-out" id="header-search-panel">
+        <div class="relative">
+          <input autocomplete="off" class="w-full bg-black/35 border border-white/30 text-white placeholder:text-white/70 px-3 py-2 text-sm backdrop-blur-sm focus:outline-none focus:border-white focus:ring-0 focus:ring-transparent" id="header-search-input" placeholder="Search articles..." type="text"/>
+        </div>
+        <div class="absolute top-full mt-2 left-0 w-full bg-white text-zinc-900 border border-zinc-200 shadow-lg max-h-80 overflow-y-auto opacity-0 pointer-events-none -translate-y-2 transition-all duration-200 ease-out" id="header-search-results"></div>
+      </div>
+    </div>
+    <button aria-label="Toggle theme" class="transition-opacity hover:opacity-70 flex items-center" id="header-theme-toggle" type="button">
+      <span class="material-symbols-outlined text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]" id="header-theme-icon">dark_mode</span>
+    </button>
+    <a class="transition-opacity hover:opacity-70 flex items-center" href={`${base}rss.xml`} rel="noopener noreferrer" target="_blank" title="RSS Feed"><span class="material-symbols-outlined text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">rss_feed</span></a>
+  </div>
+</header>
+
+<script is:inline>
+  (() => {
+    const topActionsRoot = document.getElementById("top-actions-root");
+    const headerSearchToggle = document.getElementById("header-search-toggle");
+    const headerSearchPanel = document.getElementById("header-search-panel");
+    const headerSearchInput = document.getElementById("header-search-input");
+    const headerSearchResults = document.getElementById("header-search-results");
+    const headerThemeToggle = document.getElementById("header-theme-toggle");
+    const headerThemeIcon = document.getElementById("header-theme-icon");
+    if (!topActionsRoot || !headerSearchToggle || !headerSearchPanel || !headerSearchInput || !headerSearchResults) return;
+
+    const applyTheme = (theme) => {
+      const root = document.documentElement;
+      root.classList.remove("light", "dark");
+      root.classList.add(theme);
+      root.dataset.theme = theme;
+      if (headerThemeIcon) headerThemeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
+      if (headerThemeToggle) {
+        headerThemeToggle.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+      }
+    };
+
+    const getCurrentTheme = () => (document.documentElement.classList.contains("dark") ? "dark" : "light");
+    applyTheme(getCurrentTheme());
+
+    headerThemeToggle?.addEventListener("click", () => {
+      const nextTheme = getCurrentTheme() === "dark" ? "light" : "dark";
+      applyTheme(nextTheme);
+      try {
+        localStorage.setItem("theme", nextTheme);
+      } catch {
+        // ignore storage failures (private mode / disabled storage)
+      }
+    });
+
+    const MIN_SEARCH_CHARS = 1;
+    const MAX_SEARCH_RESULTS = 8;
+    let searchSource = [];
+    try {
+      const payload = decodeURIComponent(topActionsRoot.getAttribute("data-search-items") || "%5B%5D");
+      searchSource = JSON.parse(payload || "[]");
+    } catch {
+      searchSource = [];
+    }
+    const indexedSource = searchSource.map((item) => ({
+      ...item,
+      searchable: `${item.title} ${(item.tags || []).join(" ")} ${item.excerpt || ""}`.toLowerCase(),
+    }));
+    const searchState = { matches: [], activeIndex: -1 };
+    headerSearchPanel.dataset.open = "false";
+
+    const hideSearchResults = () => {
+      headerSearchResults.classList.add("opacity-0", "pointer-events-none", "-translate-y-2");
+      headerSearchResults.classList.remove("opacity-100", "translate-y-0");
+      headerSearchResults.innerHTML = "";
+      searchState.matches = [];
+      searchState.activeIndex = -1;
+    };
+
+    const showSearchResults = () => {
+      headerSearchResults.classList.remove("opacity-0", "pointer-events-none", "-translate-y-2");
+      headerSearchResults.classList.add("opacity-100", "translate-y-0");
+    };
+
+    const isSearchPanelOpen = () => headerSearchPanel.dataset.open === "true";
+
+    const openSearchPanel = () => {
+      if (isSearchPanelOpen()) return;
+      headerSearchPanel.classList.remove("hidden");
+      window.requestAnimationFrame(() => {
+        headerSearchPanel.dataset.open = "true";
+        headerSearchPanel.classList.remove("opacity-0", "pointer-events-none", "translate-x-2");
+        headerSearchPanel.classList.add("opacity-100", "translate-x-0");
+      });
+    };
+
+    const closeSearchPanel = () => {
+      headerSearchPanel.dataset.open = "false";
+      headerSearchPanel.classList.add("opacity-0", "pointer-events-none", "translate-x-2");
+      headerSearchPanel.classList.remove("opacity-100", "translate-x-0");
+      hideSearchResults();
+      window.setTimeout(() => {
+        if (!isSearchPanelOpen()) headerSearchPanel.classList.add("hidden");
+      }, 200);
+    };
+
+    const renderSearchResults = () => {
+      if (!searchState.matches.length) {
+        headerSearchResults.innerHTML = '<div class="px-3 py-2 text-sm text-zinc-500">No matching posts</div>';
+        showSearchResults();
+        return;
+      }
+
+      const itemsHtml = searchState.matches
+        .map((item, index) => {
+          const active = index === searchState.activeIndex;
+          const className = active
+            ? "w-full text-left px-3 py-2 bg-zinc-100 border-b border-zinc-100 last:border-b-0"
+            : "w-full text-left px-3 py-2 hover:bg-zinc-50 border-b border-zinc-100 last:border-b-0";
+          return `<button class="${className}" data-search-index="${index}" type="button">
+              <div class="text-sm font-semibold text-zinc-900 truncate">${item.title}</div>
+              <div class="text-[11px] text-zinc-500 truncate">${(item.tags || []).join(" · ")}</div>
+            </button>`;
+        })
+        .join("");
+
+      headerSearchResults.innerHTML = itemsHtml;
+      showSearchResults();
+
+      Array.from(headerSearchResults.querySelectorAll("[data-search-index]")).forEach((btn) => {
+        btn.addEventListener("mousedown", (event) => {
+          event.preventDefault();
+          const idx = Number(btn.getAttribute("data-search-index"));
+          const target = searchState.matches[idx];
+          if (target?.href) window.location.href = target.href;
+        });
+      });
+    };
+
+    const updateSearchMatches = () => {
+      const query = headerSearchInput.value.trim().toLowerCase();
+      if (query.length < MIN_SEARCH_CHARS) {
+        hideSearchResults();
+        return;
+      }
+      openSearchPanel();
+      searchState.matches = indexedSource
+        .filter((item) => item.searchable.includes(query))
+        .slice(0, MAX_SEARCH_RESULTS);
+      searchState.activeIndex = searchState.matches.length ? 0 : -1;
+      renderSearchResults();
+    };
+
+    headerSearchToggle.addEventListener("click", () => {
+      if (isSearchPanelOpen()) {
+        closeSearchPanel();
+      } else {
+        openSearchPanel();
+        headerSearchInput.focus();
+        updateSearchMatches();
+      }
+    });
+
+    headerSearchInput.addEventListener("input", updateSearchMatches);
+    headerSearchInput.addEventListener("focus", updateSearchMatches);
+    headerSearchInput.addEventListener("blur", () => {
+      window.setTimeout(hideSearchResults, 120);
+    });
+
+    headerSearchInput.addEventListener("keydown", (event) => {
+      if (!searchState.matches.length) return;
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        searchState.activeIndex = (searchState.activeIndex + 1) % searchState.matches.length;
+        renderSearchResults();
+        return;
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        searchState.activeIndex = (searchState.activeIndex - 1 + searchState.matches.length) % searchState.matches.length;
+        renderSearchResults();
+        return;
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const idx = searchState.activeIndex >= 0 ? searchState.activeIndex : 0;
+        const target = searchState.matches[idx];
+        if (target?.href) window.location.href = target.href;
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeSearchPanel();
+      }
+    });
+
+    document.addEventListener("mousedown", (event) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (
+        headerSearchPanel.contains(target) ||
+        headerSearchInput.contains(target) ||
+        headerSearchResults.contains(target) ||
+        headerSearchToggle.contains(target)
+      ) return;
+      closeSearchPanel();
+    });
+  })();
+</script>

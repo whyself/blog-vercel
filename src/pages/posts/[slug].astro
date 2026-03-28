@@ -1,0 +1,509 @@
+﻿---
+import { getCollection, render } from 'astro:content';
+import "katex/dist/katex.min.css";
+import HeroBanner from '../../components/HeroBanner.astro';
+import InitialViewportScript from '../../components/InitialViewportScript.astro';
+import PageHead from '../../components/PageHead.astro';
+import ScrollTopButton from '../../components/ScrollTopButton.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import TopActions from '../../components/TopActions.astro';
+import { buildSearchItems, getPublishedPosts, sortPostsByDateAsc } from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const base = import.meta.env.BASE_URL;
+const allPosts = sortPostsByDateAsc(await getPublishedPosts());
+const searchPosts = buildSearchItems(allPosts, base);
+const currentPostIndex = allPosts.findIndex((entry) => entry.slug === post.slug);
+const previousPost = currentPostIndex > 0 ? allPosts[currentPostIndex - 1] : null;
+const nextPost = currentPostIndex >= 0 && currentPostIndex < allPosts.length - 1 ? allPosts[currentPostIndex + 1] : null;
+const title = post.data.title;
+const heroImageLight = `${base}images/blog-hero-light.png`;
+const heroImageDark = `${base}images/blog-hero-dark.png`;
+const authorAvatar = post.data.authorAvatar ?? `${base}images/profile-avatar.jpg`;
+const headingTocItems = (headings ?? []).filter((h) => h.depth >= 2 && h.depth <= 3);
+const fallbackTocItems = (post.data.toc ?? []).map((item) => ({
+  depth: 2,
+  slug: item.id,
+  text: item.label,
+}));
+const tocItems = headingTocItems.length > 0 ? headingTocItems : fallbackTocItems;
+const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
+const seoTitle = `${title} | whyself`;
+const seoDescription = post.data.excerpt;
+const canonicalUrl = new URL(`${base}posts/${post.slug}/`, siteOrigin).toString();
+const rawOgImage = post.data.thumbnail ?? heroImageLight;
+const ogImageUrl = /^https?:\/\//.test(rawOgImage) ? rawOgImage : new URL(rawOgImage, siteOrigin).toString();
+const articleJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: seoDescription,
+  url: canonicalUrl,
+  image: [ogImageUrl],
+  datePublished: post.data.publishDate.toISOString(),
+  dateModified: post.data.publishDate.toISOString(),
+  author: {
+    "@type": "Person",
+    name: post.data.author,
+  },
+  publisher: {
+    "@type": "Person",
+    name: "whyself",
+    image: {
+      "@type": "ImageObject",
+      url: new URL(`${base}images/profile-avatar.jpg`, siteOrigin).toString(),
+    },
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": canonicalUrl,
+  },
+};
+---
+
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<PageHead
+  base={base}
+  title={seoTitle}
+  description={seoDescription}
+  canonicalUrl={canonicalUrl}
+  ogType="article"
+  ogImageUrl={ogImageUrl}
+  twitterCard="summary_large_image"
+  articlePublishedTime={post.data.publishDate.toISOString()}
+  jsonLd={articleJsonLd}
+/>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+  }
+.article-body {
+    --body-size: 1rem;
+    --body-line: 1.72;
+    --h1-size: clamp(1.5rem, 2.25vw, 1.86rem);
+    --h2-size: clamp(1.28rem, 1.85vw, 1.54rem);
+    --h3-size: clamp(1.14rem, 1.45vw, 1.3rem);
+    --h4-size: clamp(1.04rem, 1.18vw, 1.16rem);
+    color: #1f2937;
+    font-family: Newsreader, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Serif SC", serif;
+    font-size: var(--body-size);
+    line-height: var(--body-line);
+  }
+  .article-body :global(h1),
+  .article-body :global(h2),
+  .article-body :global(h3),
+  .article-body :global(h4) {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    color: #1f2329;
+    letter-spacing: -0.015em;
+    font-weight: 700;
+    line-height: 1.32;
+    margin-top: 1.3em !important;
+    margin-bottom: 0.45em !important;
+  }
+  .article-body :global(h1) {
+    font-size: var(--h1-size);
+  }
+  .article-body :global(h2) {
+    font-size: var(--h2-size);
+  }
+  .article-body :global(h3) {
+    font-size: var(--h3-size);
+  }
+  .article-body :global(h4) {
+    font-size: var(--h4-size);
+  }
+  .article-body :global(p),
+  .article-body :global(li),
+  .article-body :global(td) {
+    font-size: var(--body-size);
+    line-height: var(--body-line);
+  }
+  .article-body :global(blockquote) {
+    font-size: 0.98rem;
+    line-height: var(--body-line);
+    color: #4b5563;
+    border-left: 3px solid #d0d7de;
+    padding-left: 0.9em;
+    margin: 0.95em 0 !important;
+  }
+  .article-body :global(blockquote p) {
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0;
+  }
+  .article-body :global(p),
+  .article-body :global(li),
+  .article-body :global(blockquote),
+  .article-body :global(td) {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+  .article-body :global(p) {
+    margin: 0.8em 0;
+  }
+  .article-body :global(p + h2),
+  .article-body :global(p + h3),
+  .article-body :global(p + h4) {
+    margin-top: 1.05em !important;
+  }
+  .article-body :global(ul),
+  .article-body :global(ol) {
+    margin: 0.85em 0 1.15em;
+    padding-left: 1.45em;
+  }
+  .article-body :global(ul) {
+    list-style: disc;
+  }
+  .article-body :global(ol) {
+    list-style: decimal;
+  }
+  .article-body :global(li) {
+    margin: 0.32em 0;
+    padding-left: 0.1em;
+    display: list-item;
+  }
+  .article-body :global(li::marker) {
+    color: #4b5563;
+    font-size: 0.95em;
+  }
+  .article-body :global(li > ul),
+  .article-body :global(li > ol) {
+    margin-top: 0.45em;
+    margin-bottom: 0.5em;
+  }
+  .article-body :global(hr) {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 1.55em 0;
+  }
+  .article-body :global(strong) {
+    font-weight: 700;
+    color: #111827;
+  }
+  html.dark .article-body :global(strong) {
+    color: #f7fbff;
+  }
+  .article-body :global(a) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: #9ca3af;
+    transition: color 0.15s ease;
+  }
+  .article-body :global(a:hover) {
+    color: #111827;
+    text-decoration-color: #111827;
+  }
+  .article-body :global(pre) {
+    background: #f6f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.65rem;
+    padding: 1rem 1.1rem;
+    margin: 1.25rem 0;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  .article-body :global(pre code) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #1f2937;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    display: block;
+    padding: 0;
+    overflow-x: auto;
+    box-shadow: none;
+  }
+  .article-body :global(p code),
+  .article-body :global(li code),
+  .article-body :global(blockquote code),
+  .article-body :global(td code) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.84em;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: #374151;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.3rem;
+    padding: 0.08em 0.42em;
+  }
+  .article-body :global(.code-block-shell) {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.7rem;
+    background: #f8f9fb;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+  }
+  .article-body :global(.code-block-head) {
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.75rem 0 0.85rem;
+    background: #f2f4f7;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .article-body :global(.code-block-lang) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.72rem;
+    line-height: 1;
+    color: #6b7280;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+  }
+  .article-body :global(.code-block-copy) {
+    width: 1.7rem;
+    height: 1.7rem;
+    border: 1px solid #d0d7de;
+    background: #ffffff;
+    color: #24292f;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .article-body :global(.code-block-copy:hover) {
+    background: #f3f4f6;
+  }
+  .article-body :global(.code-block-shell pre) {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: #f8f9fb;
+    padding: 0.9rem 1rem 1rem;
+  }
+  html.dark body {
+    background: #0b0d10;
+    color: #e5edf7;
+  }
+  html.dark .article-body {
+    color: #d7e2ee;
+  }
+  html.dark .article-body :global(h1),
+  html.dark .article-body :global(h2),
+  html.dark .article-body :global(h3),
+  html.dark .article-body :global(h4) {
+    color: #f3f7fd;
+  }
+  html.dark .article-body :global(blockquote) {
+    color: #b5c3d4;
+    border-left-color: #46556a;
+  }
+  html.dark .article-body :global(a) {
+    color: #dbe7f7;
+    text-decoration-color: #6f8097;
+  }
+  html.dark .article-body :global(a:hover) {
+    color: #ffffff;
+    text-decoration-color: #ffffff;
+  }
+  html.dark .article-body :global(pre) {
+    border-color: #373e47;
+    box-shadow: none;
+  }
+  html.dark .article-body :global(p code),
+  html.dark .article-body :global(li code),
+  html.dark .article-body :global(blockquote code),
+  html.dark .article-body :global(td code) {
+    color: #adbac7;
+    background: #2d333b;
+    border-color: #444c56;
+  }
+  html.dark .article-body :global(.code-block-shell) {
+    border-color: #373e47;
+    background: #22272e;
+  }
+  html.dark .article-body :global(.code-block-head) {
+    background: #2d333b;
+    border-bottom-color: #373e47;
+  }
+  html.dark .article-body :global(.code-block-lang) {
+    color: #768390;
+  }
+  html.dark .article-body :global(.code-block-copy) {
+    background: #373e47;
+    color: #adbac7;
+    border-color: #545d68;
+  }
+  html.dark .article-body :global(.code-block-copy:hover) {
+    background: #444c56;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<TopActions searchItems={searchPosts} />
+<main class="w-full mb-8">
+  <HeroBanner alt="Hero Header Image" lightImage={heroImageLight} darkImage={heroImageDark} />
+  <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 mt-12 relative z-10" data-content-start>
+    <nav class="mb-12">
+      <a class="inline-flex items-center gap-2.5 font-headline font-bold text-sm uppercase tracking-[0.12em] text-primary hover:opacity-60 transition-opacity" href={base}>
+        <span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+        back to the list
+      </a>
+    </nav>
+    <div class="flex flex-col lg:flex-row gap-8 xl:gap-10">
+      <article class="flex-1 max-w-4xl mx-auto lg:mx-0 bg-transparent p-0 md:p-0 shadow-none">
+        <header class="mb-10">
+          <h1 class="font-headline text-[1.75rem] md:text-[2.15rem] font-bold tracking-tight text-primary leading-tight mb-4">{title}</h1>
+          <div class="flex items-center gap-3 mb-5">
+            <img alt="Author" class="w-6 h-6 rounded-full object-cover" src={authorAvatar}/>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-headline text-[11px] font-semibold tracking-wide text-primary">Written by {post.data.author}</span>
+              <span class="text-outline-variant">|</span>
+              <span class="font-headline text-[11px] tracking-wide text-on-surface-variant">{post.data.articleDate ?? post.data.listDate}</span>
+              {post.data.tags.map((tag) => (
+                <span class="px-3 py-1 bg-surface-container-high text-[10px] font-headline font-bold uppercase tracking-widest rounded-full">{tag}</span>
+              ))}
+            </div>
+          </div>
+          {post.data.subtitle && <p class="font-body text-[1.02rem] text-on-surface-variant leading-relaxed">{post.data.subtitle}</p>}
+        </header>
+        <div class="article-body text-on-surface">
+          <Content />
+        </div>
+        {(previousPost || nextPost) && (
+          <nav class="mt-12 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between border-t border-outline-variant/20 pt-6 dark:border-zinc-700/50">
+            {previousPost ? (
+              <a class="group inline-flex items-center gap-1.5 text-sm font-headline text-on-surface-variant hover:text-primary transition-colors" href={`${base}posts/${previousPost.slug}/`}>
+                <span class="material-symbols-outlined text-[18px]" data-icon="arrow_back">arrow_back</span>
+                <span>上一篇: {previousPost.data.listTitle ?? previousPost.data.title}</span>
+              </a>
+            ) : (
+              <span></span>
+            )}
+            {nextPost ? (
+              <a class="group inline-flex items-center gap-1.5 text-sm font-headline text-on-surface-variant hover:text-primary transition-colors sm:justify-end" href={`${base}posts/${nextPost.slug}/`}>
+                <span>下一篇: {nextPost.data.listTitle ?? nextPost.data.title}</span>
+                <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+              </a>
+            ) : null}
+          </nav>
+        )}
+      </article>
+      <aside class="hidden lg:block w-72 xl:w-80 pt-2">
+        <div class="sticky top-12 space-y-8">
+          {tocItems.length > 0 && (
+            <div>
+              <h4 class="font-headline text-[16px] font-bold tracking-normal text-primary mb-4">Outline</h4>
+              <nav class="space-y-2.5">
+                {tocItems.map((item) => (
+                  <a
+                    class={`block font-headline ${item.depth === 3 ? "text-[13px] pl-6 font-normal" : "text-[14px] pl-4 font-medium"} tracking-normal text-on-surface-variant hover:text-primary transition-colors border-l-2 border-transparent hover:border-primary leading-[1.42]`}
+                    href={`#${item.slug}`}
+                  >
+                    {item.text}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          )}
+          <div class="pt-8 border-t border-outline-variant/20 dark:border-zinc-700/40">
+            <h4 class="font-headline text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-4">Share</h4>
+            <div class="flex gap-2">
+              <button aria-label="Copy link" class="w-8 h-8 flex items-center justify-center bg-surface-container-high hover:bg-primary hover:text-white transition-all" data-share-copy-link type="button">
+                <span class="material-symbols-outlined text-sm" data-icon="link">link</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+<ScrollTopButton />
+<SiteFooter />
+<script is:inline>
+  (() => {
+    const shareCopyButton = document.querySelector("[data-share-copy-link]");
+
+    const blocks = Array.from(document.querySelectorAll(".article-body pre"));
+    blocks.forEach((pre) => {
+      if (pre.parentElement?.classList.contains("code-block-shell")) return;
+      const code = pre.querySelector("code");
+      if (!code) return;
+
+      const className = code.className || "";
+      const matched = className.match(/language-([a-zA-Z0-9_-]+)/);
+      const rawLang = (pre.getAttribute("data-language") || code.getAttribute("data-language") || matched?.[1] || "").toLowerCase();
+      const lang = (rawLang === "text" || rawLang === "txt" || rawLang === "plaintext" || rawLang === "") ? "plain" : rawLang;
+      const rawText = code.textContent || "";
+
+      const shell = document.createElement("div");
+      shell.className = "code-block-shell";
+
+      const head = document.createElement("div");
+      head.className = "code-block-head";
+
+      const langNode = document.createElement("span");
+      langNode.className = "code-block-lang";
+      langNode.textContent = lang;
+
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "code-block-copy";
+      copyBtn.innerHTML = "<span class='material-symbols-outlined' style='font-size:14px;line-height:1'>content_copy</span>";
+      copyBtn.title = "Copy code";
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(rawText);
+          copyBtn.innerHTML = "<span class='material-symbols-outlined' style='font-size:14px;line-height:1'>check</span>";
+          setTimeout(() => { copyBtn.innerHTML = "<span class='material-symbols-outlined' style='font-size:14px;line-height:1'>content_copy</span>"; }, 1200);
+        } catch {
+          copyBtn.innerHTML = "<span class='material-symbols-outlined' style='font-size:14px;line-height:1'>error</span>";
+          setTimeout(() => { copyBtn.innerHTML = "<span class='material-symbols-outlined' style='font-size:14px;line-height:1'>content_copy</span>"; }, 1200);
+        }
+      });
+
+      head.appendChild(langNode);
+      head.appendChild(copyBtn);
+      shell.appendChild(head);
+
+      pre.parentNode?.insertBefore(shell, pre);
+      shell.appendChild(pre);
+    });
+
+    shareCopyButton?.addEventListener("click", async () => {
+      const icon = shareCopyButton.querySelector(".material-symbols-outlined");
+      const originalIcon = icon?.textContent || "link";
+      const currentUrl = window.location.href;
+
+      const setIcon = (nextIcon) => {
+        if (icon) icon.textContent = nextIcon;
+      };
+
+      const resetIconLater = () => {
+        window.setTimeout(() => setIcon(originalIcon), 1200);
+      };
+
+      try {
+        if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
+        await navigator.clipboard.writeText(currentUrl);
+        setIcon("check");
+        resetIconLater();
+      } catch {
+        setIcon("error");
+        resetIconLater();
+      }
+    });
+
+  })();
+</script>
+<InitialViewportScript />
+</body></html>

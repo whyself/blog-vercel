@@ -1,0 +1,59 @@
+---
+const { threshold = 320, appearOffset = 180 } = Astro.props;
+---
+
+<button
+  aria-label="Back to top"
+  class="scroll-top-btn fixed left-12 bottom-12 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-outline-variant/40 bg-surface-container text-on-surface shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-container-high hover:shadow-lg dark:border-zinc-600/70 dark:bg-zinc-800/90 dark:text-zinc-100 dark:hover:bg-zinc-700/90"
+  data-scroll-top
+  data-threshold={threshold}
+  data-appear-offset={appearOffset}
+  type="button"
+>
+  <span class="material-symbols-outlined text-[20px]" data-icon="arrow_upward">arrow_upward</span>
+</button>
+
+<style>
+  .scroll-top-btn {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+  }
+  .scroll-top-btn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const button = document.querySelector("[data-scroll-top]");
+    if (!button) return;
+
+    const threshold = Number(button.getAttribute("data-threshold") || "320");
+    const appearOffset = Number(button.getAttribute("data-appear-offset") || "180");
+    const initialOffsetRatio = 0.22;
+
+    const getEntryScrollTop = () => {
+      const contentStart = document.querySelector("[data-content-start]");
+      if (!contentStart) return 0;
+      const contentTop = contentStart.getBoundingClientRect().top + window.scrollY;
+      return Math.max(0, Math.round(contentTop - window.innerHeight * initialOffsetRatio));
+    };
+
+    const syncVisibility = () => {
+      const contentStart = document.querySelector("[data-content-start]");
+      const showAt = contentStart ? getEntryScrollTop() + appearOffset : threshold;
+      button.classList.toggle("is-visible", window.scrollY > showAt);
+    };
+
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: getEntryScrollTop(), behavior: "smooth" });
+    });
+
+    window.addEventListener("scroll", syncVisibility, { passive: true });
+    window.addEventListener("pageshow", syncVisibility);
+    syncVisibility();
+  })();
+</script>

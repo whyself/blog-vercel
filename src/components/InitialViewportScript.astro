@@ -1,0 +1,37 @@
+---
+interface Props {
+  selector?: string;
+  offsetRatio?: number;
+}
+
+const { selector = '[data-content-start]', offsetRatio = 0.22 } = Astro.props as Props;
+
+const script = `(() => {
+  const contentStart = document.querySelector(${JSON.stringify(selector)});
+  if (!contentStart) return;
+
+  const applyInitialViewportPosition = () => {
+    if (window.location.hash) return;
+    const navigationType = performance.getEntriesByType("navigation")?.[0]?.type;
+    if (navigationType === "back_forward") return;
+    const contentTop = contentStart.getBoundingClientRect().top + window.scrollY;
+    const targetTop = Math.max(0, Math.round(contentTop - window.innerHeight * ${offsetRatio}));
+    window.scrollTo({ top: targetTop, behavior: "auto" });
+  };
+
+  const scheduleInitialViewportPosition = () => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(applyInitialViewportPosition);
+    });
+  };
+
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+
+  scheduleInitialViewportPosition();
+  window.addEventListener("pageshow", scheduleInitialViewportPosition);
+})();`;
+---
+
+<script is:inline set:html={script}></script>

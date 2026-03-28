@@ -1,0 +1,41 @@
+﻿---
+const {
+  image,
+  lightImage,
+  darkImage,
+  alt = "Hero background",
+  title = "",
+} = Astro.props as {
+  image?: string;
+  lightImage?: string;
+  darkImage?: string;
+  alt?: string;
+  title?: string;
+};
+---
+
+<section class="w-full relative overflow-visible bg-surface-dim" data-hero>
+  {lightImage && darkImage ? (
+    <>
+      <img alt={alt} class="w-full h-auto block dark:hidden" src={lightImage}/>
+      <img alt={alt} class="w-full h-auto hidden dark:block" src={darkImage}/>
+    </>
+  ) : (
+    <img alt={alt} class="w-full h-auto block" src={image}/>
+  )}
+  <div class="absolute inset-0 z-[1] bg-black/10"></div>
+  <div class="absolute inset-x-0 bottom-0 z-[2] h-24 md:h-36 bg-gradient-to-t from-white/[0.88] via-white/[0.34] to-transparent dark:from-black/[0.76] dark:via-black/[0.38] dark:to-transparent"></div>
+  <div class="absolute bottom-0 left-0 z-[3] w-full p-8 md:p-12">
+    {title && (
+      <h1
+        class="text-5xl md:text-8xl font-semibold text-on-surface leading-none"
+        style="font-family: 'Dancing Script', 'Segoe Script', cursive;"
+      >
+        {title}
+      </h1>
+    )}
+  </div>
+</section>
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap');
+</style>

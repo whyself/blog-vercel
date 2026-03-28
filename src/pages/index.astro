@@ -1,0 +1,311 @@
+﻿---
+import HeroBanner from '../components/HeroBanner.astro';
+import InitialViewportScript from '../components/InitialViewportScript.astro';
+import PageHead from '../components/PageHead.astro';
+import ProfileSidebar from '../components/ProfileSidebar.astro';
+import ScrollTopButton from '../components/ScrollTopButton.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import TopActions from '../components/TopActions.astro';
+import { recommendedReads } from '../data/recommended-reads';
+import { buildSearchItems, getPublishedPosts, sortPostsByDateDesc } from '../utils/posts';
+
+const base = import.meta.env.BASE_URL;
+const posts = sortPostsByDateDesc(await getPublishedPosts());
+const heroImageLight = `${base}images/blog-hero-light.png`;
+const heroImageDark = `${base}images/blog-hero-dark.png`;
+const searchPosts = buildSearchItems(posts, base);
+const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
+const seoTitle = 'Blog | whyself';
+const seoDescription = 'whyself 的个人博客，记录成长、系统思维、阅读、电影与技术实践。';
+const canonicalUrl = new URL(base, siteOrigin).toString();
+const ogImageUrl = new URL(`${base}images/blog-hero-light.png`, siteOrigin).toString();
+---
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<PageHead
+  base={base}
+  title={seoTitle}
+  description={seoDescription}
+  canonicalUrl={canonicalUrl}
+  ogType="website"
+  ogImageUrl={ogImageUrl}
+  twitterCard="summary_large_image"
+/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .serif-text { font-family: 'Newsreader', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-white">
+<TopActions searchItems={searchPosts} />
+<HeroBanner lightImage={heroImageLight} darkImage={heroImageDark} title="Blog" />
+<main class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row min-h-screen" data-content-start>
+<ProfileSidebar active="home" />
+<section class="flex-1 lg:-ml-16 lg:pl-0 lg:pr-0 py-8 md:py-12">
+<div class="w-full mx-0 px-6 md:px-8 lg:pl-14 lg:pr-10 py-8 md:py-10 bg-surface-container-lowest dark:bg-zinc-900 border border-surface-container-high dark:border-zinc-700 rounded-sm">
+<div class="mb-6">
+<h1 class="font-headline font-black uppercase text-sm tracking-[0.2em] text-outline">ARCHIVES</h1>
+</div>
+<div class="mb-4 pb-2">
+<div class="flex space-x-10 overflow-x-auto no-scrollbar">
+<button class="font-label font-bold text-xs uppercase tracking-widest text-primary border-b-2 border-primary pb-4 whitespace-nowrap" data-major-filter="all" type="button">All Posts</button>
+<button class="font-label font-bold text-xs uppercase tracking-widest text-outline hover:text-primary pb-4 transition-colors whitespace-nowrap" data-major-filter="articles" type="button">Articles</button>
+<button class="font-label font-bold text-xs uppercase tracking-widest text-outline hover:text-primary pb-4 transition-colors whitespace-nowrap" data-major-filter="books" type="button">Books</button>
+<button class="font-label font-bold text-xs uppercase tracking-widest text-outline hover:text-primary pb-4 transition-colors whitespace-nowrap" data-major-filter="shows-and-movies" type="button">Shows and Movies</button>
+</div>
+</div>
+<nav class="mb-3 flex items-center justify-between pb-2" id="pagination-top">
+<button class="font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 text-outline hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed" id="prev-page-top" type="button">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span>Previous</span>
+</button>
+<button class="font-label font-bold text-xs uppercase tracking-widest flex items-center space-x-2 text-outline hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed" id="next-page-top" type="button">
+<span>Next</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</nav>
+<div class="space-y-16" id="post-list-top">
+{posts.map((post) => {
+  const detailHref = `${base}posts/${post.slug}/`;
+  const title = post.data.listTitle ?? post.data.title;
+  const majorKey = post.data.majorCategory.toLowerCase().replaceAll(" ", "-");
+  const tagData = post.data.tags.join("||");
+  return (
+    <article class="group cursor-pointer" data-major={majorKey} data-post-card="" data-tags={tagData}>
+      {post.data.thumbnail ? (
+        <div class="flex flex-col md:flex-row md:items-start gap-8">
+          <div class="flex-1 space-y-4 order-2 md:order-1">
+            <div class="flex items-center space-x-4">
+              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.listDate}</span>
+              <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.wordCount}</span>
+            </div>
+            <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
+              <a href={detailHref} class="hover:opacity-80 transition-opacity">{title}</a>
+            </h3>
+            <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">{post.data.excerpt}</p>
+            <div class="flex space-x-2 pt-2">
+              {post.data.tags.map((tag) => (
+                <span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
+              ))}
+            </div>
+          </div>
+          <div class="w-full md:w-48 h-48 bg-surface-container shrink-0 order-1 md:order-2 overflow-hidden">
+            <img alt={title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src={post.data.thumbnail}/>
+          </div>
+        </div>
+      ) : (
+        <div class="flex flex-col md:flex-row md:items-start gap-8">
+          <div class="flex-1 space-y-4">
+            <div class="flex items-center space-x-4">
+              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.listDate}</span>
+              <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.wordCount}</span>
+            </div>
+            <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
+              <a href={detailHref}>{title}</a>
+            </h3>
+            <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">{post.data.excerpt}</p>
+            <div class="flex space-x-2 pt-2">
+              {post.data.tags.map((tag) => (
+                <span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+</article>
+  );
+})}
+</div>
+<nav class="mt-24 flex items-center justify-center border-t border-surface-container-high pt-12">
+<div class="flex space-x-6 font-label font-bold text-xs" id="page-numbers-bottom"></div>
+</nav>
+</div>
+</section>
+<aside class="w-full lg:w-[24rem] xl:w-[26rem] p-6 lg:pl-6 lg:pr-4 lg:pt-12 lg:pb-8 lg:sticky lg:top-16 lg:h-fit">
+<h4 class="font-headline font-black uppercase text-[10px] tracking-[0.3em] mb-8 text-on-surface">Categories</h4>
+<div class="flex flex-wrap gap-3" id="tag-filters">
+</div>
+<div class="mt-16">
+<h4 class="font-headline font-black uppercase text-[10px] tracking-[0.3em] mb-8 text-on-surface">Recent Reads</h4>
+<ul class="space-y-6 font-body italic text-lg text-on-surface-variant">
+{recommendedReads.map((item) => (
+  <li class="leading-snug">
+    <a
+      class="hover:text-primary transition-colors"
+      href={item.href}
+      rel={/^https?:\/\//i.test(item.href) ? 'noopener noreferrer' : undefined}
+      target={/^https?:\/\//i.test(item.href) ? '_blank' : undefined}
+    >
+      {item.title}
+    </a>
+  </li>
+))}
+</ul>
+</div>
+</aside>
+</main>
+<SiteFooter />
+<ScrollTopButton />
+<script is:inline>
+  (() => {
+    const cards = Array.from(document.querySelectorAll("[data-post-card]"));
+    const majorButtons = Array.from(document.querySelectorAll("[data-major-filter]"));
+    const tagContainer = document.getElementById("tag-filters");
+    const prevPageButton = document.getElementById("prev-page-top");
+    const nextPageButton = document.getElementById("next-page-top");
+    const pageNumbers = document.getElementById("page-numbers-bottom");
+    const contentStart = document.querySelector("[data-content-start]");
+    if (!cards.length || !majorButtons.length || !tagContainer || !prevPageButton || !nextPageButton || !pageNumbers) return;
+
+    const PAGE_SIZE = 10;
+    const INITIAL_CONTENT_OFFSET_RATIO = 0.22;
+    const tagSelectedClass = "px-5 py-2.5 bg-primary text-on-primary text-[10px] font-bold uppercase tracking-[0.15em] rounded-full shadow-sm";
+    const tagUnselectedClass = "px-5 py-2.5 border border-surface-container-highest text-on-surface-variant hover:border-primary hover:text-primary transition-all text-[10px] font-bold uppercase tracking-[0.15em] rounded-full";
+    const state = { major: "all", tag: "all", page: 1 };
+
+    const getInitialViewportScrollTop = () => {
+      if (!contentStart) return 0;
+      const contentTop = contentStart.getBoundingClientRect().top + window.scrollY;
+      return Math.max(0, Math.round(contentTop - window.innerHeight * INITIAL_CONTENT_OFFSET_RATIO));
+    };
+
+    const getTags = (card) => (card.getAttribute("data-tags") || "").split("||").filter(Boolean);
+
+    const updateMajorButtons = () => {
+      majorButtons.forEach((btn) => {
+        const isActive = btn.dataset.majorFilter === state.major;
+        btn.classList.toggle("border-b-2", isActive);
+        btn.classList.toggle("border-primary", isActive);
+        btn.classList.toggle("text-primary", isActive);
+        btn.classList.toggle("text-outline", !isActive);
+      });
+    };
+
+    const getAvailableTags = () => {
+      const tagSet = new Set();
+      cards.forEach((card) => {
+        const major = card.getAttribute("data-major");
+        if (state.major === "all" || major === state.major) {
+          getTags(card).forEach((tag) => tagSet.add(tag));
+        }
+      });
+      return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+    };
+
+    const renderTagButtons = () => {
+      const tags = getAvailableTags();
+      if (state.tag !== "all" && !tags.includes(state.tag)) state.tag = "all";
+      tagContainer.innerHTML = "";
+
+      const buildTagButton = (label, value, active) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.tagFilter = value;
+        btn.className = active ? tagSelectedClass : tagUnselectedClass;
+        btn.textContent = label;
+        btn.addEventListener("click", () => {
+          state.tag = value;
+          applyFilters();
+        });
+        return btn;
+      };
+
+      tagContainer.appendChild(buildTagButton("All", "all", state.tag === "all"));
+      tags.forEach((tag) => tagContainer.appendChild(buildTagButton(tag, tag, state.tag === tag)));
+    };
+
+    const getFilteredCards = () =>
+      cards.filter((card) => {
+        const major = card.getAttribute("data-major");
+        const tags = getTags(card);
+        const majorMatch = state.major === "all" || major === state.major;
+        const tagMatch = state.tag === "all" || tags.includes(state.tag);
+        return majorMatch && tagMatch;
+      });
+
+    const scrollToInitialViewportPosition = () => {
+      window.scrollTo({ top: getInitialViewportScrollTop(), behavior: "smooth" });
+    };
+
+    const renderPagination = (totalPages) => {
+      prevPageButton.disabled = state.page <= 1;
+      nextPageButton.disabled = state.page >= totalPages;
+      pageNumbers.innerHTML = "";
+
+      for (let i = 1; i <= totalPages; i += 1) {
+        if (i === state.page) {
+          const active = document.createElement("span");
+          active.className = "text-primary border-b border-primary";
+          active.textContent = String(i).padStart(2, "0");
+          pageNumbers.appendChild(active);
+          continue;
+        }
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "text-outline hover:text-primary transition-colors";
+        btn.textContent = String(i).padStart(2, "0");
+        btn.addEventListener("click", () => {
+          state.page = i;
+          applyFilters();
+          scrollToInitialViewportPosition();
+        });
+        pageNumbers.appendChild(btn);
+      }
+    };
+
+    const applyFilters = () => {
+      const filteredCards = getFilteredCards();
+      const totalPages = Math.max(1, Math.ceil(filteredCards.length / PAGE_SIZE));
+      if (state.page > totalPages) state.page = totalPages;
+      const start = (state.page - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+
+      cards.forEach((card) => {
+        card.hidden = true;
+      });
+      filteredCards.slice(start, end).forEach((card) => {
+        card.hidden = false;
+      });
+
+      updateMajorButtons();
+      renderTagButtons();
+      renderPagination(totalPages);
+    };
+
+    majorButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.major = btn.dataset.majorFilter || "all";
+        state.tag = "all";
+        state.page = 1;
+        applyFilters();
+      });
+    });
+
+    prevPageButton.addEventListener("click", () => {
+      if (state.page > 1) {
+        state.page -= 1;
+        applyFilters();
+        scrollToInitialViewportPosition();
+      }
+    });
+
+    nextPageButton.addEventListener("click", () => {
+      state.page += 1;
+      applyFilters();
+      scrollToInitialViewportPosition();
+    });
+
+    applyFilters();
+  })();
+</script>
+<InitialViewportScript />
+</body></html>
+
+

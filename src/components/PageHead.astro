@@ -1,0 +1,54 @@
+---
+import ThemeConfig from './ThemeConfig.astro';
+
+interface Props {
+  base: string;
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  ogType?: string;
+  ogImageUrl: string;
+  twitterCard?: string;
+  articlePublishedTime?: string;
+  jsonLd?: unknown;
+}
+
+const {
+  base,
+  title,
+  description,
+  canonicalUrl,
+  ogType = 'website',
+  ogImageUrl,
+  twitterCard = 'summary_large_image',
+  articlePublishedTime,
+  jsonLd,
+} = Astro.props as Props;
+
+const iconUrl = `${base}images/profile-avatar.jpg`;
+const jsonLdString = jsonLd ? (typeof jsonLd === 'string' ? jsonLd : JSON.stringify(jsonLd)) : null;
+---
+
+<meta charset="utf-8" />
+<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+<title>{title}</title>
+<link href={canonicalUrl} rel="canonical" />
+<meta content={description} name="description" />
+<meta content={title} property="og:title" />
+<meta content={description} property="og:description" />
+<meta content={canonicalUrl} property="og:url" />
+<meta content={ogType} property="og:type" />
+<meta content="whyself" property="og:site_name" />
+<meta content={ogImageUrl} property="og:image" />
+{articlePublishedTime && <meta content={articlePublishedTime} property="article:published_time" />}
+<meta content={twitterCard} name="twitter:card" />
+<meta content={title} name="twitter:title" />
+<meta content={description} name="twitter:description" />
+<meta content={ogImageUrl} name="twitter:image" />
+{jsonLdString && <script is:inline type="application/ld+json" set:html={jsonLdString}></script>}
+<link href={iconUrl} rel="icon" type="image/jpeg" />
+<link href={iconUrl} rel="apple-touch-icon" />
+<script is:inline src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Newsreader:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<ThemeConfig />
