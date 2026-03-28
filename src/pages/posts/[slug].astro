@@ -8,7 +8,7 @@ import PageHead from '../../components/PageHead.astro';
 import ScrollTopButton from '../../components/ScrollTopButton.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import TopActions from '../../components/TopActions.astro';
-import { buildSearchItems, getPublishedPosts, sortPostsByDateAsc } from '../../utils/posts';
+import { buildSearchItems, getPublishedPosts, sortPostsByDateDesc } from '../../utils/posts';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
@@ -18,7 +18,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const base = import.meta.env.BASE_URL;
-const allPosts = sortPostsByDateAsc(await getPublishedPosts());
+const allPosts = sortPostsByDateDesc(await getPublishedPosts());
 const searchPosts = buildSearchItems(allPosts, base);
 const currentPostIndex = allPosts.findIndex((entry) => entry.slug === post.slug);
 const previousPost = currentPostIndex > 0 ? allPosts[currentPostIndex - 1] : null;
@@ -626,3 +626,4 @@ const articleJsonLd = {
 </script>
 <InitialViewportScript />
 </body></html>
+
