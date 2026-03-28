@@ -2,9 +2,11 @@
 interface Props {
   selector?: string;
   offsetRatio?: number;
+  behavior?: 'auto' | 'smooth';
+  delayMs?: number;
 }
 
-const { selector = '[data-content-start]', offsetRatio = 0.22 } = Astro.props as Props;
+const { selector = '[data-content-start]', offsetRatio = 0.22, behavior = 'auto', delayMs = 0 } = Astro.props as Props;
 
 const script = `(() => {
   const contentStart = document.querySelector(${JSON.stringify(selector)});
@@ -16,7 +18,9 @@ const script = `(() => {
     if (navigationType === "back_forward") return;
     const contentTop = contentStart.getBoundingClientRect().top + window.scrollY;
     const targetTop = Math.max(0, Math.round(contentTop - window.innerHeight * ${offsetRatio}));
-    window.scrollTo({ top: targetTop, behavior: "auto" });
+    const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const resolvedBehavior = prefersReducedMotion ? "auto" : ${JSON.stringify(behavior)};
+    window.scrollTo({ top: targetTop, behavior: resolvedBehavior });
   };
 
   const scheduleInitialViewportPosition = () => {
@@ -29,7 +33,13 @@ const script = `(() => {
     history.scrollRestoration = "manual";
   }
 
-  scheduleInitialViewportPosition();
+  if (document.readyState === "complete") {
+    window.setTimeout(scheduleInitialViewportPosition, ${delayMs});
+  } else {
+    window.addEventListener("load", () => {
+      window.setTimeout(scheduleInitialViewportPosition, ${delayMs});
+    }, { once: true });
+  }
   window.addEventListener("pageshow", scheduleInitialViewportPosition);
 })();`;
 ---
