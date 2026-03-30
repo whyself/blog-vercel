@@ -1,0 +1,120 @@
+﻿---
+title: "Gifted"
+excerpt: "We need life,but more importantly,we need a life."
+publishDate: 2026-03-29
+listDate: "Mar 29, 2026"
+wordCount: "941 Words"
+tags:
+  - 电影
+majorCategory: Shows and Movies
+thumbnail: "/images/posts/gifted/gifted-thumbnail.png"
+draft: false
+---
+
+We need life,
+
+but more importantly,
+
+we need a life.
+
+看完《天才少女》，
+
+第一感觉是电影对人物感情的刻画很细腻。
+
+另外大概就是最近所想就有所思了。
+
+![天才少女观影截图 1](/images/posts/gifted/gifted-01.png)
+
+the price you have to pay for greatness 但是人不应该也不能抛弃自己的生活去追求所谓的远大前程，所有人都应当有“生活”的权利。
+
+![天才少女观影截图 2](/images/posts/gifted/gifted-02.png)
+
+多么幸福的生活啊，小孩子就该这样（）。
+
+![天才少女观影截图 3](/images/posts/gifted/gifted-03.png)
+
+![天才少女观影截图 4](/images/posts/gifted/gifted-04.png)
+
+这样，然后这样。
+
+![天才少女观影截图 5](/images/posts/gifted/gifted-05.png)
+
+酒文化对于我的意义除了借酒消愁，大概也就只有酒后吐真言的游戏了，说实话真的很甜。
+
+![天才少女观影截图 6](/images/posts/gifted/gifted-06.png)
+
+这里可以看得出来，对于弗兰克他也有自己的矛盾点，不只是玛丽的生活被束缚住了，其实他自己的生活也在无形中被束缚了。
+
+![天才少女观影截图 7](/images/posts/gifted/gifted-07.png)
+
+这句话很有意思，弗兰克举出玛丽所说的玩笑的确不是真心话，但是你说的这句话其实本就有违你的内心。
+
+![天才少女观影截图 8](/images/posts/gifted/gifted-08.png)
+
+这是玛丽妈妈相册的最后一张照片，这个特写好啊，她……真的没有看上去那么快乐。
+
+![天才少女观影截图 9](/images/posts/gifted/gifted-09.png)
+
+喝酒谈心，羡慕了。
+
+![天才少女观影截图 10](/images/posts/gifted/gifted-10.png)
+
+这让我想到了我们小时候，谁不想出人头地。虽然可能没有玛丽的天赋，想法却都是一致的。但是无论是谁，长大了，面对自己的生活，真的能再说出口吗？
+
+![天才少女观影截图 11](/images/posts/gifted/gifted-11.png)
+
+无论喜欢有何理由，不带自己私人目的的喜欢，才是最纯粹的。
+
+![天才少女观影截图 12](/images/posts/gifted/gifted-12.png)
+
+![天才少女观影截图 13](/images/posts/gifted/gifted-13.png)
+
+![天才少女观影截图 14](/images/posts/gifted/gifted-14.png)
+
+![天才少女观影截图 15](/images/posts/gifted/gifted-15.png)
+
+这段在讨论弗兰克继父的退休生活，隐居养马之类的。可以看得出来伊芙琳是完全不理解的，我觉得她是否也在找补自己的生活呢。70 岁啊，最近正值壮年就去世的人可不少。
+
+![天才少女观影截图 16](/images/posts/gifted/gifted-16.png)
+
+![天才少女观影截图 17](/images/posts/gifted/gifted-17.png)
+
+玛丽觉得自己是没人要的孩子，而弗兰克去告诉她：无所谓血缘，你出生的时候，总有人为你高兴。
+
+![天才少女观影截图 18](/images/posts/gifted/gifted-18.png)
+
+![天才少女观影截图 19](/images/posts/gifted/gifted-19.png)
+
+![天才少女观影截图 20](/images/posts/gifted/gifted-20.png)
+
+![天才少女观影截图 21](/images/posts/gifted/gifted-21.png)
+
+![天才少女观影截图 22](/images/posts/gifted/gifted-22.png)
+
+![天才少女观影截图 23](/images/posts/gifted/gifted-23.png)
+
+律师质问伊芙琳，黛安的生活难道只有数学吗？很显然，她做出过很多自救的尝试，但却被一一阻止了。最后只能狂热地追求数学的黛安，在完成 proof 之后，丧失了生命的意义。
+
+![天才少女观影截图 24](/images/posts/gifted/gifted-24.png)
+
+![天才少女观影截图 25](/images/posts/gifted/gifted-25.png)
+
+这段看得出来弗兰克在发泄对法院判决的不满、对自己的不满，后面再努力说服自己克制内心的懊悔。
+
+![天才少女观影截图 26](/images/posts/gifted/gifted-26.png)
+
+黛安的生活因为数学的消散而毫无锚点，失去了活下去的意义。
+
+![天才少女观影截图 27](/images/posts/gifted/gifted-27.png)
+
+伊芙琳看黛安的手稿，字字都在宣泄对母亲的愤怒与不满。
+
+![天才少女观影截图 28](/images/posts/gifted/gifted-28.png)
+
+故事的结尾，玛丽依旧上了所谓的天才学校。但此时的玛丽，未来的玛丽，她们的生命早已不止是为数学而活，而是真正意义上有了自己的生活。
+
+写在最后，也是写给自己的。如果你感到迷茫，你要去做的不是急着找到前进目标。多看看书，多看看电影，多出去走走，努力去找寻属于你自己的生活。
+
+Never bet your life on a single thing. 
+
+Everyone knows that's crazy.

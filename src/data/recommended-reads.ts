@@ -6,5 +6,5 @@ export interface RecommendedRead {
 }
 
 export const recommendedReads: RecommendedRead[] = [
-
+  {title: "Gifted",href: "/posts/gifted"}
 ];
