@@ -23,7 +23,7 @@ we need a life.
 
 另外大概就是最近所想就有所思了。
 
-![天才少女观影截图 1](/images/posts/gifted/gifted-01.png)
+![](/images/posts/gifted/gifted-01.png)
 
 the price you have to pay for greatness 但是人不应该也不能抛弃自己的生活去追求所谓的远大前程，所有人都应当有“生活”的权利。
 
