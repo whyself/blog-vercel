@@ -3,7 +3,7 @@ import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 
-const site = process.env.SITE_URL || process.env.URL || 'http://127.0.0.1:4321';
+const site = process.env.SITE_URL || process.env.URL || 'https://blog.whyself.cn';
 const base = process.env.BASE_PATH || '/';
 
 export default defineConfig({
