@@ -6,5 +6,6 @@ export interface RecommendedRead {
 }
 
 export const recommendedReads: RecommendedRead[] = [
-  {title: "Gifted",href: "/posts/gifted"}
+  {title: "Gifted",href: "/posts/gifted"},
+  {title: "个人博客搭建记",href: "/posts/个人博客搭建记"}
 ];
