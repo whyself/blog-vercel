@@ -16,7 +16,15 @@ const posts = defineCollection({
     heroImage: z.string().optional(),
     author: z.string().default('whyself'),
     authorAvatar: z.string().optional(),
-    toc: z.array(z.object({ id: z.string(), label: z.string() })).optional(),
+    toc: z
+      .array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          depth: z.number().int().min(1).max(6).optional(),
+        }),
+      )
+      .optional(),
     draft: z.boolean().optional().default(false),
   }),
 });

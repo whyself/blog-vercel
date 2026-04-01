@@ -26,13 +26,26 @@ const previousPost = currentPostIndex > 0 ? allPosts[currentPostIndex - 1] : nul
 const nextPost = currentPostIndex >= 0 && currentPostIndex < allPosts.length - 1 ? allPosts[currentPostIndex + 1] : null;
 const title = post.data.title;
 const authorAvatar = post.data.authorAvatar ?? `${base}images/profile-avatar.jpg`;
-const headingTocItems = (headings ?? []).filter((h) => h.depth >= 2 && h.depth <= 3);
+const headingTocItems = (headings ?? []).filter((h) => h.depth >= 1 && h.depth <= 6);
 const fallbackTocItems = (post.data.toc ?? []).map((item) => ({
-  depth: 2,
+  depth: item.depth ?? 2,
   slug: item.id,
   text: item.label,
 }));
 const tocItems = headingTocItems.length > 0 ? headingTocItems : fallbackTocItems;
+const tocBaseDepth = tocItems.reduce((minDepth, item) => Math.min(minDepth, item.depth), 6);
+const getTocItemClass = (depth: number) => {
+  const level = Math.max(0, depth - tocBaseDepth);
+  const levels = [
+    "text-[14px] pl-4 font-medium",
+    "text-[13px] pl-7 font-normal",
+    "text-[12px] pl-10 font-normal",
+    "text-[12px] pl-12 font-normal",
+    "text-[12px] pl-14 font-normal",
+    "text-[12px] pl-16 font-normal",
+  ];
+  return levels[Math.min(level, levels.length - 1)];
+};
 const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
 const seoTitle = `${title} | whyself`;
 const seoDescription = post.data.excerpt;
@@ -81,6 +94,10 @@ const articleJsonLd = {
   jsonLd={articleJsonLd}
 />
 <style>
+  .post-content-start {
+    --article-top-gap: 3rem;
+    margin-top: var(--article-top-gap);
+  }
   .article-body {
     --body-size: 1rem;
     --body-line: 1.72;
@@ -382,20 +399,25 @@ const articleJsonLd = {
       min-width: 0;
     }
   }
+  @media (max-width: 1023px) {
+    .post-content-start {
+      --article-top-gap: 2rem;
+    }
+  }
 </style>
 </head>
 <body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
 <TopActions searchItems={searchPosts} />
-<main class="w-full mb-8 overflow-x-hidden">
+<main class="w-full mb-8">
   <HeroBanner alt="Hero Header Image" base={base} />
-  <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 mt-12 relative z-10 overflow-x-hidden" data-content-start>
+  <div class="post-content-start max-w-screen-2xl mx-auto px-6 lg:px-12 relative z-10" data-content-start>
     <nav class="mb-12">
       <a class="inline-flex items-center gap-2.5 font-headline font-bold text-sm uppercase tracking-[0.12em] text-primary hover:opacity-60 transition-opacity" href={base}>
         <Icon class="w-5 h-5" name="arrow_back" />
         back to the list
       </a>
     </nav>
-    <div class="flex flex-col lg:flex-row gap-8 xl:gap-10">
+    <div class="flex flex-col lg:flex-row lg:items-start gap-8 xl:gap-10">
       <article class="flex-1 min-w-0 max-w-4xl mx-auto lg:mx-0 bg-transparent p-0 md:p-0 shadow-none overflow-x-hidden">
         <header class="mb-10">
           <h1 class="font-headline text-[1.75rem] md:text-[2.15rem] font-bold tracking-tight text-primary leading-tight mb-4 break-words">{title}</h1>
@@ -432,15 +454,17 @@ const articleJsonLd = {
           </nav>
         )}
       </article>
-      <aside class="hidden lg:block w-72 xl:w-80 pt-2">
-        <div class="sticky top-12 space-y-8">
+      <aside class="hidden lg:block w-72 xl:w-80 pt-2 self-start lg:sticky lg:h-fit" style="top: var(--article-top-gap);">
+        <div class="space-y-8">
           {tocItems.length > 0 && (
             <div>
               <h4 class="font-headline text-[16px] font-bold tracking-normal text-primary mb-4">Outline</h4>
               <nav class="space-y-2.5">
                 {tocItems.map((item) => (
                   <a
-                    class={`block font-headline ${item.depth === 3 ? "text-[13px] pl-6 font-normal" : "text-[14px] pl-4 font-medium"} tracking-normal text-on-surface-variant hover:text-primary transition-colors border-l-2 border-transparent hover:border-primary leading-[1.42]`}
+                    class={`block font-headline ${getTocItemClass(item.depth)} tracking-normal text-on-surface-variant hover:text-primary transition-colors border-l-2 border-transparent leading-[1.42]`}
+                    data-toc-link
+                    data-toc-slug={item.slug}
                     href={`#${item.slug}`}
                   >
                     {item.text}
@@ -622,6 +646,60 @@ const articleJsonLd = {
         resetIconLater();
       }
     });
+
+    const tocLinks = Array.from(document.querySelectorAll("[data-toc-link]"));
+    if (tocLinks.length > 0) {
+      const tocMap = new Map();
+      tocLinks.forEach((link) => {
+        const slug = link.getAttribute("data-toc-slug");
+        if (!slug) return;
+        const target = document.getElementById(slug);
+        if (!target) return;
+        tocMap.set(target, link);
+      });
+
+      const setActiveTocLink = (activeLink) => {
+        tocLinks.forEach((link) => {
+          const isActive = link === activeLink;
+          link.classList.toggle("text-primary", isActive);
+          link.classList.toggle("border-primary", isActive);
+          link.classList.toggle("font-semibold", isActive);
+          link.classList.toggle("text-on-surface-variant", !isActive);
+          link.classList.toggle("border-transparent", !isActive);
+        });
+      };
+
+      const headingEntries = Array.from(tocMap.keys());
+
+      const pickActiveHeadingByVisibility = () => {
+        const current =
+          headingEntries.find((heading) => heading.getBoundingClientRect().bottom > 0) ??
+          headingEntries[headingEntries.length - 1] ??
+          null;
+        setActiveTocLink(current ? tocMap.get(current) : null);
+      };
+
+      pickActiveHeadingByVisibility();
+
+      const observer = new IntersectionObserver(
+        () => {
+          pickActiveHeadingByVisibility();
+        },
+        {
+          root: null,
+          rootMargin: "0px",
+          threshold: [0, 0.01, 1],
+        },
+      );
+
+      headingEntries.forEach((heading) => observer.observe(heading));
+      window.addEventListener("scroll", pickActiveHeadingByVisibility, { passive: true });
+      window.addEventListener("resize", pickActiveHeadingByVisibility);
+
+      window.addEventListener("hashchange", () => {
+        window.requestAnimationFrame(pickActiveHeadingByVisibility);
+      });
+    }
 
   })();
 </script>
