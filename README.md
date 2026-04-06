@@ -57,3 +57,19 @@ npm run build
   - 子路径部署：`/<your-path>/`
 
 `BASE_PATH` 会影响内部链接、分页路由、RSS/Sitemap 等 URL 生成，请确保与部署平台配置一致。
+
+## 文章图片排版组件
+
+文章页支持可复用的图文混排类（定义于 `src/pages/posts/[slug].astro`）：
+
+- `post-media post-media--float post-media--float-right`：文首右浮小图
+- `post-media post-media--float post-media--float-left`：左浮小图（少量使用）
+- `post-media-clear`：清除浮动
+- `post-media post-media--center-narrow`：段间窄幅居中图
+- `post-media-pair post-media-pair--left`：左图右文并排，桌面端底部齐平
+- `post-media-pair__text`：并排布局中的右侧文字容器
+- `post-media-pair--balanced`：放大左图并拉大间距，使右侧文字与图片上下对齐
+
+可参考模板 `templates/new-post-template.md`。
+
+如果后续 agent 需要按同一规则排版，请使用项目内 skill：`skills/post-image-layout/SKILL.md`。

@@ -56,6 +56,30 @@ draft: true
 
 在这里开始写正文。
 
+<!-- 可复用图片排版组件（建议二选一或组合） -->
+<!-- 1) 文首右浮小图：短文推荐，只放 1 张 -->
+<figure class="post-media post-media--float post-media--float-right">
+  <img src="/images/posts/your-post/cover.jpg" alt="图片描述" />
+</figure>
+
+<!-- 2) 段间窄幅居中图：用于场景切换 -->
+<div class="post-media-clear"></div>
+<figure class="post-media post-media--center-narrow">
+  <img src="/images/posts/your-post/scene.jpg" alt="图片描述" />
+</figure>
+
+<!-- 3) 左图右文（底部齐平）：适合结尾收束段 -->
+<div class="post-media-pair post-media-pair--left post-media-pair--balanced">
+  <figure class="post-media">
+    <img src="/images/posts/your-post/ending.jpg" alt="图片描述" />
+    <figcaption>一句简短收束语。</figcaption>
+  </figure>
+  <div class="post-media-pair__text">
+    <p>右侧段落 1。</p>
+    <p>右侧段落 2。</p>
+  </div>
+</div>
+
 ## 第一节
 
 正文内容……
