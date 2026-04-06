@@ -26,8 +26,45 @@ const {
   jsonLd,
 } = Astro.props as Props;
 
-const iconUrl = `${base}images/profile-avatar.jpg`;
-const jsonLdString = jsonLd ? (typeof jsonLd === 'string' ? jsonLd : JSON.stringify(jsonLd)) : null;
+const faviconIcoUrl = `${base}favicon.ico`;
+const favicon16Url = `${base}favicon-16x16.png`;
+const favicon32Url = `${base}favicon-32x32.png`;
+const appleTouchIconUrl = `${base}apple-touch-icon.png`;
+const manifestUrl = `${base}site.webmanifest`;
+
+let siteOrigin = 'https://blog.whyself.cn';
+try {
+  siteOrigin = new URL(canonicalUrl).origin;
+} catch {
+  // Keep default origin for metadata fallbacks.
+}
+
+const siteRootUrl = new URL(base, siteOrigin).toString();
+const profileImageUrl = new URL(`${base}images/profile-avatar.jpg`, siteOrigin).toString();
+const siteLogoUrl = new URL(`${base}android-chrome-512x512.png`, siteOrigin).toString();
+
+const pageJsonLdString = jsonLd ? (typeof jsonLd === 'string' ? jsonLd : JSON.stringify(jsonLd)) : null;
+const siteJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteRootUrl}#website`,
+      url: siteRootUrl,
+      name: 'Blog | whyself',
+      inLanguage: 'zh-CN',
+      image: siteLogoUrl,
+    },
+    {
+      '@type': 'Person',
+      '@id': `${siteRootUrl}#person`,
+      name: 'whyself',
+      url: siteRootUrl,
+      image: profileImageUrl,
+    },
+  ],
+};
+const siteJsonLdString = JSON.stringify(siteJsonLd);
 ---
 
 <meta charset="utf-8" />
@@ -46,8 +83,16 @@ const jsonLdString = jsonLd ? (typeof jsonLd === 'string' ? jsonLd : JSON.string
 <meta content={title} name="twitter:title" />
 <meta content={description} name="twitter:description" />
 <meta content={ogImageUrl} name="twitter:image" />
-{jsonLdString && <script is:inline type="application/ld+json" set:html={jsonLdString}></script>}
-<link href={iconUrl} rel="icon" type="image/jpeg" />
-<link href={iconUrl} rel="apple-touch-icon" />
+<meta content="#ffffff" name="theme-color" />
+<meta content="#ffffff" name="msapplication-TileColor" />
+<meta content={siteLogoUrl} name="msapplication-TileImage" />
+{pageJsonLdString && <script is:inline type="application/ld+json" set:html={pageJsonLdString}></script>}
+<script is:inline type="application/ld+json" set:html={siteJsonLdString}></script>
+<link href={manifestUrl} rel="manifest" />
+<link href={faviconIcoUrl} rel="shortcut icon" />
+<link href={faviconIcoUrl} rel="icon" sizes="any" />
+<link href={favicon32Url} rel="icon" sizes="32x32" type="image/png" />
+<link href={favicon16Url} rel="icon" sizes="16x16" type="image/png" />
+<link href={appleTouchIconUrl} rel="apple-touch-icon" sizes="180x180" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Newsreader:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet" />
 <ThemeConfig />
