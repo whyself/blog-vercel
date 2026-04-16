@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Cangjie logo</title>
+  <desc id="desc">Blue and green Cangjie mark on a light background.</desc>
+  <rect width="512" height="512" fill="#f7f7f5" rx="32" />
+  <path
+    d="M102 124v264l200-25-112-24V173l112 15-200-64Z"
+    fill="#3d75e8"
+  />
+  <path
+    d="M348 156v200l62-7V163l-62-7Z"
+    fill="#67e29d"
+  />
+  <path
+    d="M286 168v28h44v120h-44v28l70 13V155l-70 13Z"
+    fill="#ffffff"
+  />
+</svg>
