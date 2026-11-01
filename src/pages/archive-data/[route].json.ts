@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getArchiveData, type ArchiveRoute } from '../../utils/archive';
 
-const VALID_ROUTES: ArchiveRoute[] = ['all', 'articles', 'books', 'shows-and-movies', 'moments'];
+const VALID_ROUTES: ArchiveRoute[] = ['all', 'articles', 'moments'];
 
 export async function getStaticPaths() {
   return VALID_ROUTES.map((route) => ({ params: { route } }));

@@ -9,7 +9,7 @@ export interface SearchItem {
   excerpt?: string;
 }
 
-export type MajorRoute = 'all' | 'articles' | 'books' | 'shows-and-movies';
+export type MajorRoute = 'all' | 'articles';
 
 export async function getPublishedPosts(): Promise<PostEntry[]> {
   return getCollection('posts', ({ data }) => !data.draft);
@@ -31,11 +31,5 @@ export function buildSearchItems(posts: PostEntry[], base: string): SearchItem[]
 export function filterPostsByMajorRoute(posts: PostEntry[], route: MajorRoute): PostEntry[] {
   if (route === 'all') return posts;
 
-  const majorCategoryByRoute = {
-    articles: 'Articles',
-    books: 'Books',
-    'shows-and-movies': 'Shows and Movies',
-  } as const;
-
-  return posts.filter((post) => post.data.majorCategory === majorCategoryByRoute[route]);
+  return posts.filter((post) => post.data.majorCategory === 'Articles');
 }

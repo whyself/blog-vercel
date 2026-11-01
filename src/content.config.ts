@@ -14,7 +14,7 @@ const posts = defineCollection({
     articleDate: z.string().optional(),
     wordCount: z.string(),
     tags: z.array(z.string()),
-    majorCategory: z.enum(['Articles', 'Books', 'Shows and Movies']),
+    majorCategory: z.enum(['Articles']),
     thumbnail: z.string().optional(),
     heroImage: z.string().optional(),
     author: z.string().default('whyself'),

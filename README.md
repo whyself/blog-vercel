@@ -1,9 +1,9 @@
-# Whyself 博客（Astro）
+﻿# Whyself 博客（Astro）
 
 这是一个基于 Astro Content Collections 的个人博客项目，支持：
 
 - Markdown 内容管理
-- 首页与分类归档分页
+- 首页与分类归档分页（Articles / Moments）
 - 文章详情页（含目录、代码块增强、图片增强）
 - 动态卡片（仅列表展示，支持图文与标签）
 - 站内搜索、主题切换、RSS、Sitemap、Robots
@@ -16,9 +16,7 @@
 - `src/content.config.ts`：内容 schema（文章、动态与页面字段）
 - `src/pages/index.astro`：首页归档（第 1 页，文章与动态按日期混排）
 - `src/pages/page/[page].astro`：首页归档分页
-- `src/pages/articles/**`：Articles 分类归档与分页
-- `src/pages/books/**`：Books 分类归档与分页
-- `src/pages/shows-and-movies/**`：Shows and Movies 分类归档与分页
+- `src/pages/articles/**`：Articles 分类归档与分页（全部文章）
 - `src/pages/moments/**`：动态归档与分页
 - `src/pages/posts/[slug].astro`：文章详情页
 - `src/pages/archive-data/[route].json.ts`：归档筛选所需的按路由数据源
@@ -80,7 +78,7 @@ npm run build
 
 ## 动态（Moments）
 
-动态用于记录短句与照片，只在列表中出现，不生成可点击进入的详情页。它们会出现在首页 `All` 时间线中，也可以从 `Moments` 归档单独查看；分类页与搜索、RSS 仍只包含文章。
+动态用于记录短句与照片，只在列表中出现，不生成可点击进入的详情页。它们会出现在首页 `All` 时间线中，也可以从 `Moments` 归档单独查看；归档导航保留 `All`、`Moments`、`Articles`，文章卡片以 `ARTICLE` 标识、动态卡片以 `MOMENT` 标识。分类页与搜索、RSS 仍只包含文章。
 
 在 `src/content/moments/` 下新建 `.md` 文件，Frontmatter 字段如下：
 

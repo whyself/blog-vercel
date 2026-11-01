@@ -6,7 +6,7 @@ listDate: "Mar 29, 2026"
 wordCount: "941 Words"
 tags:
   - 电影
-majorCategory: Shows and Movies
+majorCategory: Articles
 thumbnail: "/images/posts/gifted/gifted-thumbnail.png"
 draft: false
 ---

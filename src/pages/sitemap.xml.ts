@@ -15,8 +15,6 @@ export const GET: APIRoute = async ({ site }) => {
     { loc: urlFor(`${basePath}about/`), lastmod: nowIso },
     { loc: urlFor(`${basePath}bio/`), lastmod: nowIso },
     { loc: urlFor(`${basePath}articles/`), lastmod: nowIso },
-    { loc: urlFor(`${basePath}books/`), lastmod: nowIso },
-    { loc: urlFor(`${basePath}shows-and-movies/`), lastmod: nowIso },
     { loc: urlFor(`${basePath}moments/`), lastmod: nowIso },
     { loc: urlFor(`${basePath}rss.xml`), lastmod: nowIso },
   ];
@@ -50,11 +48,7 @@ export const GET: APIRoute = async ({ site }) => {
       }))
     : [];
 
-  const categoryConfigs = [
-    { slug: 'articles', category: 'Articles' as const },
-    { slug: 'books', category: 'Books' as const },
-    { slug: 'shows-and-movies', category: 'Shows and Movies' as const },
-  ];
+  const categoryConfigs = [{ slug: 'articles', category: 'Articles' as const }];
 
   const categoryEntries = categoryConfigs.flatMap((config) => {
     const categoryPosts = posts.filter((post) => post.data.majorCategory === config.category);

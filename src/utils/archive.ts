@@ -35,7 +35,7 @@ export interface MomentCardData {
 export type ArchiveCardData = PostCardData | MomentCardData;
 
 interface ArchiveSeoConfig {
-  sectionPath: '' | 'articles' | 'books' | 'shows-and-movies' | 'moments';
+  sectionPath: '' | 'articles' | 'moments';
   indexTitle: string;
   indexDescription: string;
   pagedTitle: (page: number) => string;
@@ -56,20 +56,6 @@ const archiveSeoConfig: Record<ArchiveRoute, ArchiveSeoConfig> = {
     indexDescription: 'Article archive by whyself.',
     pagedTitle: (page) => `Articles - Page ${page} | whyself`,
     pagedDescription: (page) => `Article archive page ${page} on whyself.`,
-  },
-  books: {
-    sectionPath: 'books',
-    indexTitle: 'Books | whyself',
-    indexDescription: 'Book archive by whyself.',
-    pagedTitle: (page) => `Books - Page ${page} | whyself`,
-    pagedDescription: (page) => `Book archive page ${page} on whyself.`,
-  },
-  'shows-and-movies': {
-    sectionPath: 'shows-and-movies',
-    indexTitle: 'Shows and Movies | whyself',
-    indexDescription: 'Shows and movies archive by whyself.',
-    pagedTitle: (page) => `Shows and Movies - Page ${page} | whyself`,
-    pagedDescription: (page) => `Shows and movies archive page ${page} on whyself.`,
   },
   moments: {
     sectionPath: 'moments',
