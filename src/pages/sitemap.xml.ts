@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import { getPublishedMoments, sortMomentsByDateDesc } from '../utils/moments';
 import { sortPostsByDateDesc } from '../utils/posts';
 
 export const GET: APIRoute = async ({ site }) => {
@@ -14,30 +15,40 @@ export const GET: APIRoute = async ({ site }) => {
     { loc: urlFor(`${basePath}about/`), lastmod: nowIso },
     { loc: urlFor(`${basePath}bio/`), lastmod: nowIso },
     { loc: urlFor(`${basePath}articles/`), lastmod: nowIso },
-    { loc: urlFor(`${basePath}books/`), lastmod: nowIso },
-    { loc: urlFor(`${basePath}shows-and-movies/`), lastmod: nowIso },
+    { loc: urlFor(`${basePath}moments/`), lastmod: nowIso },
     { loc: urlFor(`${basePath}rss.xml`), lastmod: nowIso },
   ];
 
   const posts = sortPostsByDateDesc(await getCollection('posts', ({ data }) => !data.draft));
-  const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
+  const moments = sortMomentsByDateDesc(await getPublishedMoments());
+  const latestPostIso = posts[0]?.data.publishDate.toISOString() ?? nowIso;
+  const latestMomentIso = moments[0]?.data.date.toISOString() ?? nowIso;
+  const latestAllIso = (posts[0]?.data.publishDate.valueOf() ?? 0) >= (moments[0]?.data.date.valueOf() ?? 0)
+    ? latestPostIso
+    : latestMomentIso;
+
   const postEntries = posts.map((post) => ({
     loc: urlFor(`${basePath}posts/${post.id}/`),
     lastmod: post.data.publishDate.toISOString(),
   }));
 
-  const pageEntries = totalPages > 1
-    ? Array.from({ length: totalPages - 1 }, (_, idx) => ({
+  const allTotalPages = Math.max(1, Math.ceil((posts.length + moments.length) / PAGE_SIZE));
+  const pageEntries = allTotalPages > 1
+    ? Array.from({ length: allTotalPages - 1 }, (_, idx) => ({
         loc: urlFor(`${basePath}page/${idx + 2}/`),
-        lastmod: posts[0]?.data.publishDate.toISOString() ?? nowIso,
+        lastmod: latestAllIso,
       }))
     : [];
 
-  const categoryConfigs = [
-    { slug: 'articles', category: 'Articles' as const },
-    { slug: 'books', category: 'Books' as const },
-    { slug: 'shows-and-movies', category: 'Shows and Movies' as const },
-  ];
+  const momentsTotalPages = Math.max(1, Math.ceil(moments.length / PAGE_SIZE));
+  const momentPageEntries = momentsTotalPages > 1
+    ? Array.from({ length: momentsTotalPages - 1 }, (_, idx) => ({
+        loc: urlFor(`${basePath}moments/page/${idx + 2}/`),
+        lastmod: latestMomentIso,
+      }))
+    : [];
+
+  const categoryConfigs = [{ slug: 'articles', category: 'Articles' as const }];
 
   const categoryEntries = categoryConfigs.flatMap((config) => {
     const categoryPosts = posts.filter((post) => post.data.majorCategory === config.category);
@@ -54,7 +65,13 @@ export const GET: APIRoute = async ({ site }) => {
     return entries;
   });
 
-  const allEntries = [...staticEntries, ...pageEntries, ...categoryEntries, ...postEntries];
+  const allEntries = [
+    ...staticEntries,
+    ...pageEntries,
+    ...momentPageEntries,
+    ...categoryEntries,
+    ...postEntries,
+  ];
   const urlset = allEntries
     .map(
       (entry) => `<url>

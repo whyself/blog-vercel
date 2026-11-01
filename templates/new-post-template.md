@@ -1,4 +1,4 @@
----
+﻿---
 # ===== Required =====
 # title: 文章主标题（文章页 H1 + SEO 标题基础）
 title: "文章标题"
@@ -20,7 +20,7 @@ tags:
   - 中文
   - 标签2
 
-# majorCategory: 主分类（只能是 Articles / Books / Shows and Movies）
+# majorCategory: 主分类（目前只有 Articles）
 majorCategory: Articles
 
 # ===== Optional (delete if unused) =====
