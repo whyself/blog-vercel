@@ -5,6 +5,7 @@ interface Props {
   behavior?: 'auto' | 'smooth';
   delayMs?: number;
   durationMs?: number;
+  skipOnMobile?: boolean;
 }
 
 const {
@@ -13,6 +14,7 @@ const {
   behavior = 'smooth',
   delayMs = 120,
   durationMs = 760,
+  skipOnMobile = false,
 } = Astro.props as Props;
 
 const script = `(() => {
@@ -22,6 +24,13 @@ const script = `(() => {
 
   const run = () => {
     if (hasStartedInitialScroll) return;
+
+    // The mobile profile now lives on top of the hero, so keep the first
+    // viewport at the top instead of scrolling past it.
+    if (${JSON.stringify(skipOnMobile)} && window.matchMedia("(max-width: 1023px)").matches) {
+      hasStartedInitialScroll = true;
+      return;
+    }
 
     const hash = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "";
     if (hash) {
