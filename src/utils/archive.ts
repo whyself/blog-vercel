@@ -1,16 +1,48 @@
 import { filterPostsByMajorRoute, getPublishedPosts, sortPostsByDateDesc, type MajorRoute, type PostEntry } from './posts';
+import { formatMomentListDate, getPublishedMoments, sortMomentsByDateDesc, type MomentEntry } from './moments';
 
 export const ARCHIVE_PAGE_SIZE = 10;
 
+export type ArchiveRoute = MajorRoute | 'moments';
+
+export interface PostCardData {
+  kind: 'post';
+  id: string;
+  title: string;
+  href: string;
+  listDate: string;
+  wordCount: string;
+  excerpt: string;
+  tags: string[];
+  thumbnail: string;
+}
+
+export interface MomentCardImage {
+  src: string;
+  alt: string;
+}
+
+export interface MomentCardData {
+  kind: 'moment';
+  id: string;
+  title: string;
+  text: string;
+  listDate: string;
+  tags: string[];
+  images: MomentCardImage[];
+}
+
+export type ArchiveCardData = PostCardData | MomentCardData;
+
 interface ArchiveSeoConfig {
-  sectionPath: '' | 'articles' | 'books' | 'shows-and-movies';
+  sectionPath: '' | 'articles' | 'books' | 'shows-and-movies' | 'moments';
   indexTitle: string;
   indexDescription: string;
   pagedTitle: (page: number) => string;
   pagedDescription: (page: number) => string;
 }
 
-const archiveSeoConfig: Record<MajorRoute, ArchiveSeoConfig> = {
+const archiveSeoConfig: Record<ArchiveRoute, ArchiveSeoConfig> = {
   all: {
     sectionPath: '',
     indexTitle: 'Blog | whyself',
@@ -39,9 +71,16 @@ const archiveSeoConfig: Record<MajorRoute, ArchiveSeoConfig> = {
     pagedTitle: (page) => `Shows and Movies - Page ${page} | whyself`,
     pagedDescription: (page) => `Shows and movies archive page ${page} on whyself.`,
   },
+  moments: {
+    sectionPath: 'moments',
+    indexTitle: 'Moments | whyself',
+    indexDescription: 'Short notes, photos and moments from whyself.',
+    pagedTitle: (page) => `Moments - Page ${page} | whyself`,
+    pagedDescription: (page) => `Moments archive page ${page} on whyself.`,
+  },
 };
 
-const toCanonicalPath = (route: MajorRoute, currentPage: number): string => {
+const toCanonicalPath = (route: ArchiveRoute, currentPage: number): string => {
   const config = archiveSeoConfig[route];
   if (currentPage <= 1) {
     return config.sectionPath ? `${config.sectionPath}/` : '';
@@ -50,23 +89,82 @@ const toCanonicalPath = (route: MajorRoute, currentPage: number): string => {
   return `${config.sectionPath}/page/${currentPage}/`;
 };
 
-export async function getArchivePostsByRoute(route: MajorRoute): Promise<{ allPosts: PostEntry[]; routePosts: PostEntry[] }> {
+export function getMomentImageAlt(moment: MomentEntry, alt: string | undefined): string {
+  return alt?.trim() || moment.data.title?.trim() || 'Moment image';
+}
+
+export function toPostCardData(post: PostEntry, base: string): PostCardData {
+  return {
+    kind: 'post',
+    id: post.id,
+    title: post.data.listTitle ?? post.data.title,
+    href: `${base}posts/${post.id}/`,
+    listDate: post.data.listDate,
+    wordCount: post.data.wordCount,
+    excerpt: post.data.excerpt,
+    tags: post.data.tags,
+    thumbnail: post.data.thumbnail ?? '',
+  };
+}
+
+export function toMomentCardData(moment: MomentEntry): MomentCardData {
+  return {
+    kind: 'moment',
+    id: moment.id,
+    title: moment.data.title?.trim() ?? '',
+    text: moment.data.text.trim(),
+    listDate: moment.data.listDate?.trim() || formatMomentListDate(moment.data.date),
+    tags: moment.data.tags ?? [],
+    images: (moment.data.images ?? []).map((image) => ({
+      src: image.src,
+      alt: getMomentImageAlt(moment, image.alt),
+    })),
+  };
+}
+
+export interface ArchiveData {
+  cards: ArchiveCardData[];
+  allPosts: PostEntry[];
+  allMoments: MomentEntry[];
+}
+
+export async function getArchiveData(route: ArchiveRoute, base: string): Promise<ArchiveData> {
   const allPosts = sortPostsByDateDesc(await getPublishedPosts());
+  const allMoments = sortMomentsByDateDesc(await getPublishedMoments());
+  const postCards = allPosts.map((post) => toPostCardData(post, base));
+  const momentCards = allMoments.map(toMomentCardData);
+
+  if (route === 'moments') {
+    return { cards: momentCards, allPosts, allMoments };
+  }
+
+  if (route === 'all') {
+    const datedCards = [
+      ...allPosts.map((post, index) => ({ date: post.data.publishDate.valueOf(), card: postCards[index] })),
+      ...allMoments.map((moment, index) => ({ date: moment.data.date.valueOf(), card: momentCards[index] })),
+    ];
+    return {
+      cards: datedCards.sort((a, b) => b.date - a.date).map((entry) => entry.card),
+      allPosts,
+      allMoments,
+    };
+  }
+
   const routePosts = filterPostsByMajorRoute(allPosts, route);
-  return { allPosts, routePosts };
+  return { cards: routePosts.map((post) => toPostCardData(post, base)), allPosts, allMoments };
 }
 
-export function paginatePosts(posts: PostEntry[], currentPage: number, pageSize = ARCHIVE_PAGE_SIZE): PostEntry[] {
+export function paginateCards(cards: ArchiveCardData[], currentPage: number, pageSize = ARCHIVE_PAGE_SIZE): ArchiveCardData[] {
   const start = (currentPage - 1) * pageSize;
-  return posts.slice(start, start + pageSize);
+  return cards.slice(start, start + pageSize);
 }
 
-export function getTotalPages(posts: PostEntry[], pageSize = ARCHIVE_PAGE_SIZE): number {
-  return Math.max(1, Math.ceil(posts.length / pageSize));
+export function getTotalPages(cards: ArchiveCardData[], pageSize = ARCHIVE_PAGE_SIZE): number {
+  return Math.max(1, Math.ceil(cards.length / pageSize));
 }
 
-export function buildArchiveStaticPaths(routePosts: PostEntry[], pageSize = ARCHIVE_PAGE_SIZE) {
-  const totalPages = getTotalPages(routePosts, pageSize);
+export function buildArchiveStaticPaths(cards: ArchiveCardData[], pageSize = ARCHIVE_PAGE_SIZE) {
+  const totalPages = getTotalPages(cards, pageSize);
   return Array.from({ length: Math.max(0, totalPages - 1) }, (_, idx) => {
     const currentPage = idx + 2;
     return {
@@ -74,13 +172,13 @@ export function buildArchiveStaticPaths(routePosts: PostEntry[], pageSize = ARCH
       props: {
         currentPage,
         totalPages,
-        posts: paginatePosts(routePosts, currentPage, pageSize),
+        cards: paginateCards(cards, currentPage, pageSize),
       },
     };
   });
 }
 
-export function getArchiveSeo(route: MajorRoute, currentPage: number, base: string, siteOrigin: string) {
+export function getArchiveSeo(route: ArchiveRoute, currentPage: number, base: string, siteOrigin: string) {
   const config = archiveSeoConfig[route];
   const canonicalPath = toCanonicalPath(route, currentPage);
   return {

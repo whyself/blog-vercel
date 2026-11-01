@@ -41,4 +41,25 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { posts, pages };
+const moments = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/moments' }),
+  schema: z.object({
+    title: z.string().optional(),
+    text: z.string(),
+    date: z.coerce.date(),
+    listDate: z.string().optional(),
+    images: z
+      .array(
+        z.object({
+          src: z.string(),
+          alt: z.string().optional(),
+        }),
+      )
+      .optional()
+      .default([]),
+    tags: z.array(z.string()).optional().default([]),
+    draft: z.boolean().optional().default(false),
+  }),
+});
+
+export const collections = { posts, pages, moments };

@@ -1,32 +1,34 @@
 ﻿---
 import ArchivePageDocument from '../../../components/ArchivePageDocument.astro';
-import { ARCHIVE_PAGE_SIZE, buildArchiveStaticPaths, getArchivePostsByRoute, getArchiveSeo } from '../../../utils/archive';
-import { buildSearchItems, type PostEntry } from '../../../utils/posts';
+import { ARCHIVE_PAGE_SIZE, buildArchiveStaticPaths, getArchiveData, getArchiveSeo, type ArchiveCardData } from '../../../utils/archive';
+import { buildSearchItems } from '../../../utils/posts';
 
 export async function getStaticPaths() {
-  const { routePosts } = await getArchivePostsByRoute('articles');
-  return buildArchiveStaticPaths(routePosts, ARCHIVE_PAGE_SIZE);
+  const base = import.meta.env.BASE_URL;
+  const { cards } = await getArchiveData('articles', base);
+  return buildArchiveStaticPaths(cards, ARCHIVE_PAGE_SIZE);
 }
 
-const { currentPage, totalPages, posts } = Astro.props as {
+const { currentPage, totalPages, cards } = Astro.props as {
   currentPage: number;
   totalPages: number;
-  posts: PostEntry[];
+  cards: ArchiveCardData[];
 };
 
 const base = import.meta.env.BASE_URL;
-const { allPosts } = await getArchivePostsByRoute('articles');
+const { allPosts, allMoments } = await getArchiveData('articles', base);
 const searchPosts = buildSearchItems(allPosts, base);
 const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
 const { seoTitle, seoDescription, canonicalUrl, ogImageUrl } = getArchiveSeo('articles', currentPage, base, siteOrigin);
 ---
 <ArchivePageDocument
   base={base}
-  posts={posts}
+  cards={cards}
   searchItems={searchPosts}
   currentPage={currentPage}
   totalPages={totalPages}
-  majorRoute="articles"
+  momentsCount={allMoments.length}
+  route="articles"
   seoTitle={seoTitle}
   seoDescription={seoDescription}
   canonicalUrl={canonicalUrl}

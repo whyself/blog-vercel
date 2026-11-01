@@ -1,38 +1,45 @@
 ---
-import type { CollectionEntry } from 'astro:content';
 import HeroBanner from './HeroBanner.astro';
 import Icon from './Icon.astro';
 import InitialViewportScript from './InitialViewportScript.astro';
+import MomentCard from './MomentCard.astro';
+import PostCard from './PostCard.astro';
 import ProfileSidebar from './ProfileSidebar.astro';
 import ScrollTopButton from './ScrollTopButton.astro';
 import SiteFooter from './SiteFooter.astro';
 import TopActions from './TopActions.astro';
 import { recommendedReads } from '../data/recommended-reads';
-import type { MajorRoute, SearchItem } from '../utils/posts';
+import type { ArchiveCardData, ArchiveRoute } from '../utils/archive';
+import type { SearchItem } from '../utils/posts';
 
 interface Props {
-  posts: CollectionEntry<'posts'>[];
+  cards: ArchiveCardData[];
   searchItems: SearchItem[];
   base: string;
   currentPage: number;
   totalPages: number;
-  majorRoute?: MajorRoute;
+  momentsCount: number;
+  route?: ArchiveRoute;
 }
 
 const {
-  posts,
+  cards,
   searchItems,
   base,
   currentPage,
   totalPages,
-  majorRoute = 'all',
+  momentsCount,
+  route = 'all',
 } = Astro.props as Props;
 
-const routeRoot = majorRoute === 'all' ? base : `${base}${majorRoute}/`;
+const routeRoot = route === 'all' ? base : `${base}${route}/`;
 const pageHref = (page: number) => (page <= 1 ? routeRoot : `${routeRoot}page/${page}/`);
-const archiveDataUrl = `${base}archive-data/${majorRoute}.json`;
-const navItems: Array<{ key: MajorRoute; label: string; href: string }> = [
-  { key: 'all', label: 'All Posts', href: base },
+const archiveDataUrl = `${base}archive-data/${route}.json`;
+const navItems: Array<{ key: ArchiveRoute; label: string; href: string }> = [
+  { key: 'all', label: 'All', href: base },
+  ...(momentsCount > 0
+    ? [{ key: 'moments' as const, label: 'Moments', href: `${base}moments/` }]
+    : []),
   { key: 'articles', label: 'Articles', href: `${base}articles/` },
   { key: 'books', label: 'Books', href: `${base}books/` },
   { key: 'shows-and-movies', label: 'Shows and Movies', href: `${base}shows-and-movies/` },
@@ -62,7 +69,7 @@ const resolveHref = (href: string) => {
 <div class="mb-4 pb-2">
 <div class="flex space-x-10 overflow-x-auto no-scrollbar">
 {navItems.map((item) => (
-  <a class={navClass(item.key === majorRoute)} href={item.href}>{item.label}</a>
+  <a class={navClass(item.key === route)} href={item.href}>{item.label}</a>
 ))}
 </div>
 </div>
@@ -84,59 +91,24 @@ const resolveHref = (href: string) => {
     <Icon class="w-4 h-4" name="arrow_forward" />
   </a>
 </nav>
-<div class="space-y-16" id="post-list-top">
-{posts.map((post) => {
-  const detailHref = `${base}posts/${post.id}/`;
-  const title = post.data.listTitle ?? post.data.title;
-  const tagData = post.data.tags.join("||");
-  return (
-    <article class="group cursor-pointer" data-post-card="" data-tags={tagData} data-list-date={post.data.listDate} data-word-count={post.data.wordCount}>
-      {post.data.thumbnail ? (
-        <div class="flex flex-col md:flex-row md:items-start gap-8">
-          <div class="flex-1 space-y-4 order-2 md:order-1">
-            <div class="flex items-center space-x-4">
-              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.listDate}</span>
-              <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
-              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.wordCount}</span>
-            </div>
-            <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
-              <a href={detailHref} class="hover:opacity-80 transition-opacity">{title}</a>
-            </h3>
-            <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">{post.data.excerpt}</p>
-            <div class="flex space-x-2 pt-2">
-              {post.data.tags.map((tag) => (
-                <span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
-              ))}
-            </div>
-          </div>
-          <div class="w-full md:w-48 h-48 bg-surface-container shrink-0 order-1 md:order-2 overflow-hidden">
-            <img alt={title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" decoding="async" height="192" loading="lazy" src={post.data.thumbnail} width="192"/>
-          </div>
-        </div>
-      ) : (
-        <div class="flex flex-col md:flex-row md:items-start gap-8">
-          <div class="flex-1 space-y-4">
-            <div class="flex items-center space-x-4">
-              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.listDate}</span>
-              <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
-              <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{post.data.wordCount}</span>
-            </div>
-            <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
-              <a href={detailHref}>{title}</a>
-            </h3>
-            <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">{post.data.excerpt}</p>
-            <div class="flex space-x-2 pt-2">
-              {post.data.tags.map((tag) => (
-                <span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-</article>
-  );
-})}
-</div>
+{cards.length === 0 ? (
+  <div class="py-24 text-center">
+    <p class="font-label text-[10px] font-bold uppercase tracking-[0.25em] text-outline">
+      {route === 'moments' ? 'No moments yet' : 'No posts yet'}
+    </p>
+    <p class="serif-text mt-4 text-lg text-on-surface-variant">
+      {route === 'moments'
+        ? 'Moments will appear here once there is something to share.'
+        : 'New posts will appear here soon.'}
+    </p>
+  </div>
+) : (
+  <div class="space-y-16" id="post-list-top" data-initial-items={encodeURIComponent(JSON.stringify(cards))}>
+    {cards.map((card) => (
+      card.kind === 'moment' ? <MomentCard card={card} /> : <PostCard card={card} />
+    ))}
+  </div>
+)}
 <nav class="mt-24 flex items-center justify-center border-t border-surface-container-high pt-12">
 <div class="flex space-x-6 font-label font-bold text-xs" data-page-number-list>
 {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) =>
@@ -181,10 +153,20 @@ const resolveHref = (href: string) => {
 <script is:inline>
   (() => {
     const cardsRoot = document.getElementById("post-list-top");
-    const cards = Array.from(document.querySelectorAll("[data-post-card]"));
     const tagContainer = document.getElementById("tag-filters");
     const paginationNav = document.querySelector("[data-pagination-nav]");
-    if (!cards.length || !cardsRoot || !tagContainer || !paginationNav) return;
+    if (!cardsRoot || !tagContainer || !paginationNav) return;
+
+    const initialItems = (() => {
+      try {
+        const payload = cardsRoot.getAttribute("data-initial-items") || "%5B%5D";
+        const parsed = JSON.parse(decodeURIComponent(payload));
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    })();
+    if (!initialItems.length) return;
 
     const pageNumbersRoot = paginationNav.parentElement?.querySelector("[data-page-number-list]");
     const prevLink = paginationNav.querySelector("[data-page-prev]");
@@ -198,21 +180,8 @@ const resolveHref = (href: string) => {
     const pageSize = Number(paginationNav.getAttribute("data-page-size") || "10");
     const initialPage = Number(paginationNav.getAttribute("data-initial-page") || "1");
     const initialTotalPages = Number(paginationNav.getAttribute("data-total-pages") || "1");
-    const state = { tag: "all", page: Math.max(1, initialPage), loaded: false, items: [] };
+    const state = { tag: "all", page: Math.max(1, initialPage), loaded: false, items: initialItems };
     const pageHref = (page) => (page <= 1 ? routeRoot : `${routeRoot}page/${page}/`);
-
-    const parseDomCard = (card) => {
-      const titleAnchor = card.querySelector("h3 a");
-      const title = titleAnchor?.textContent?.trim() || "";
-      const href = titleAnchor?.getAttribute("href") || "#";
-      const excerpt = card.querySelector("p")?.textContent?.trim() || "";
-      const listDate = card.getAttribute("data-list-date") || "";
-      const wordCount = card.getAttribute("data-word-count") || "";
-      const tags = (card.getAttribute("data-tags") || "").split("||").filter(Boolean);
-      const thumbnail = card.querySelector("img")?.getAttribute("src") || "";
-      return { title, href, excerpt, listDate, wordCount, tags, thumbnail };
-    };
-    const domItems = cards.map((card) => parseDomCard(card));
 
     const escapeHtml = (value) =>
       String(value)
@@ -222,7 +191,7 @@ const resolveHref = (href: string) => {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
 
-    const renderCardHtml = (item) => {
+    const renderPostCardHtml = (item) => {
       const tagsMarkup = (item.tags || [])
         .map((tag) => `<span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">${escapeHtml(tag)}</span>`)
         .join("");
@@ -232,8 +201,9 @@ const resolveHref = (href: string) => {
       const listDate = escapeHtml(item.listDate || "");
       const wordCount = escapeHtml(item.wordCount || "");
       const tagData = escapeHtml((item.tags || []).join("||"));
+      const thumbnail = escapeHtml(item.thumbnail || "");
 
-      if (item.thumbnail) {
+      if (thumbnail) {
         return `<article class="group cursor-pointer" data-post-card="" data-tags="${tagData}">
       <div class="flex flex-col md:flex-row md:items-start gap-8">
         <div class="flex-1 space-y-4 order-2 md:order-1">
@@ -249,7 +219,7 @@ const resolveHref = (href: string) => {
           <div class="flex space-x-2 pt-2">${tagsMarkup}</div>
         </div>
         <div class="w-full md:w-48 h-48 bg-surface-container shrink-0 order-1 md:order-2 overflow-hidden">
-          <img alt="${title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" decoding="async" height="192" loading="lazy" src="${escapeHtml(item.thumbnail)}" width="192"/>
+          <img alt="${title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" decoding="async" height="192" loading="lazy" src="${thumbnail}" width="192"/>
         </div>
       </div>
     </article>`;
@@ -273,6 +243,55 @@ const resolveHref = (href: string) => {
     </article>`;
     };
 
+    const renderMomentImages = (images) => {
+      if (!images.length) return "";
+      const count = images.length;
+      const gridClass = count === 1 ? "grid-cols-1" : count === 2 || count === 4 ? "grid-cols-2" : "grid-cols-3";
+      const aspectClass = count === 1 ? "aspect-[16/10]" : count === 2 || count === 4 ? "aspect-[4/3]" : "aspect-square";
+      const imagesMarkup = images
+        .map(
+          (image) => `<figure class="relative overflow-hidden rounded-sm bg-surface-container ${aspectClass}">
+            <img alt="${escapeHtml(image.alt || "")}" class="w-full h-full object-cover" decoding="async" loading="lazy" src="${escapeHtml(image.src || "")}"/>
+          </figure>`,
+        )
+        .join("");
+      return `<div class="mt-6 grid max-w-3xl gap-2 ${gridClass}">${imagesMarkup}</div>`;
+    };
+
+    const renderMomentCardHtml = (item) => {
+      const tags = item.tags || [];
+      const tagsMarkup = tags
+        .map((tag) => `<span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">${escapeHtml(tag)}</span>`)
+        .join("");
+      const title = escapeHtml(item.title || "");
+      const text = escapeHtml(item.text || "");
+      const listDate = escapeHtml(item.listDate || "");
+      const tagData = escapeHtml(tags.join("||"));
+      const titleHtml = title
+        ? `<h3 class="mt-4 font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface">${title}</h3>`
+        : "";
+      const textHtml = text
+        ? `<p class="serif-text mt-3 text-lg leading-relaxed text-on-surface-variant max-w-2xl whitespace-pre-line">${text}</p>`
+        : "";
+      const tagsHtml = tags.length ? `<div class="flex flex-wrap gap-2 pt-5">${tagsMarkup}</div>` : "";
+
+      return `<article class="group" data-moment-card="" data-tags="${tagData}" data-list-date="${listDate}">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span class="inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+          <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+          Moment
+        </span>
+        <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">${listDate}</span>
+      </div>
+      ${titleHtml}
+      ${textHtml}
+      ${renderMomentImages(item.images || [])}
+      ${tagsHtml}
+    </article>`;
+    };
+
+    const renderCardHtml = (item) => (item.kind === "moment" ? renderMomentCardHtml(item) : renderPostCardHtml(item));
+
     const loadArchiveItems = async () => {
       if (state.loaded) return state.items;
       if (!archiveDataUrl) return state.items;
@@ -284,13 +303,13 @@ const resolveHref = (href: string) => {
         state.items = payload;
         state.loaded = true;
       } catch {
-        state.items = domItems;
+        state.items = initialItems;
         state.loaded = true;
       }
       return state.items;
     };
 
-    const getWorkingItems = () => (state.loaded ? state.items : domItems);
+    const getWorkingItems = () => state.items;
 
     const getFilteredItems = () =>
       getWorkingItems().filter((item) => state.tag === "all" || (item.tags || []).includes(state.tag));

@@ -1,12 +1,12 @@
 ﻿---
 import ArchivePageDocument from '../../components/ArchivePageDocument.astro';
-import { ARCHIVE_PAGE_SIZE, getArchivePostsByRoute, getArchiveSeo, getTotalPages, paginatePosts } from '../../utils/archive';
+import { ARCHIVE_PAGE_SIZE, getArchiveData, getArchiveSeo, getTotalPages, paginateCards } from '../../utils/archive';
 import { buildSearchItems } from '../../utils/posts';
 
 const base = import.meta.env.BASE_URL;
-const { allPosts, routePosts } = await getArchivePostsByRoute('books');
-const posts = paginatePosts(routePosts, 1, ARCHIVE_PAGE_SIZE);
-const totalPages = getTotalPages(routePosts, ARCHIVE_PAGE_SIZE);
+const { cards, allPosts, allMoments } = await getArchiveData('books', base);
+const pageCards = paginateCards(cards, 1, ARCHIVE_PAGE_SIZE);
+const totalPages = getTotalPages(cards, ARCHIVE_PAGE_SIZE);
 const currentPage = 1;
 const searchPosts = buildSearchItems(allPosts, base);
 const siteOrigin = Astro.site?.toString() ?? 'http://127.0.0.1:4321';
@@ -14,11 +14,12 @@ const { seoTitle, seoDescription, canonicalUrl, ogImageUrl } = getArchiveSeo('bo
 ---
 <ArchivePageDocument
   base={base}
-  posts={posts}
+  cards={pageCards}
   searchItems={searchPosts}
   currentPage={currentPage}
   totalPages={totalPages}
-  majorRoute="books"
+  momentsCount={allMoments.length}
+  route="books"
   seoTitle={seoTitle}
   seoDescription={seoDescription}
   canonicalUrl={canonicalUrl}

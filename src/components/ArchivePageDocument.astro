@@ -1,16 +1,17 @@
 ---
-import type { CollectionEntry } from 'astro:content';
 import ArchiveMain from './ArchiveMain.astro';
 import PageHead from './PageHead.astro';
-import type { MajorRoute, SearchItem } from '../utils/posts';
+import type { ArchiveCardData, ArchiveRoute } from '../utils/archive';
+import type { SearchItem } from '../utils/posts';
 
 interface Props {
   base: string;
-  posts: CollectionEntry<'posts'>[];
+  cards: ArchiveCardData[];
   searchItems: SearchItem[];
   currentPage: number;
   totalPages: number;
-  majorRoute: MajorRoute;
+  momentsCount: number;
+  route: ArchiveRoute;
   seoTitle: string;
   seoDescription: string;
   canonicalUrl: string;
@@ -19,11 +20,12 @@ interface Props {
 
 const {
   base,
-  posts,
+  cards,
   searchItems,
   currentPage,
   totalPages,
-  majorRoute,
+  momentsCount,
+  route,
   seoTitle,
   seoDescription,
   canonicalUrl,
@@ -49,11 +51,12 @@ const {
     </style>
 </head>
 <ArchiveMain
-  posts={posts}
+  cards={cards}
   searchItems={searchItems}
   base={base}
   currentPage={currentPage}
   totalPages={totalPages}
-  majorRoute={majorRoute}
+  momentsCount={momentsCount}
+  route={route}
 />
 </html>

@@ -5,27 +5,31 @@
 - Markdown 内容管理
 - 首页与分类归档分页
 - 文章详情页（含目录、代码块增强、图片增强）
+- 动态卡片（仅列表展示，支持图文与标签）
 - 站内搜索、主题切换、RSS、Sitemap、Robots
 
 ## 项目结构
 
 - `src/content/posts/*.md`：博客文章内容与 Frontmatter
+- `src/content/moments/*.md`：动态内容与 Frontmatter（只在列表展示，没有详情页）
 - `src/content/pages/*.md`：About/Bio 页面内容
-- `src/content/config.ts`：内容 schema（文章与页面字段）
-- `src/pages/index.astro`：首页归档（第 1 页）
+- `src/content.config.ts`：内容 schema（文章、动态与页面字段）
+- `src/pages/index.astro`：首页归档（第 1 页，文章与动态按日期混排）
 - `src/pages/page/[page].astro`：首页归档分页
 - `src/pages/articles/**`：Articles 分类归档与分页
 - `src/pages/books/**`：Books 分类归档与分页
 - `src/pages/shows-and-movies/**`：Shows and Movies 分类归档与分页
+- `src/pages/moments/**`：动态归档与分页
 - `src/pages/posts/[slug].astro`：文章详情页
 - `src/pages/archive-data/[route].json.ts`：归档筛选所需的按路由数据源
 - `src/pages/rss.xml.ts`：RSS 订阅
 - `src/pages/sitemap.xml.ts`：站点地图
 - `src/pages/robots.txt.ts`：搜索引擎抓取规则
-- `src/components/*`：页面组件（归档、顶部操作、侧栏、页脚等）
+- `src/components/*`：页面组件（归档、文章卡片、动态卡片、顶部操作、侧栏、页脚等）
 - `src/layouts/ContentInfoPageLayout.astro`：About/Bio 共享布局
-- `src/utils/archive.ts`：归档分页/SEO/路由辅助函数
+- `src/utils/archive.ts`：归档卡片、分页/SEO/路由辅助函数
 - `src/utils/posts.ts`：文章集合与搜索数据构建工具
+- `src/utils/moments.ts`：动态集合、排序与日期格式化工具
 - `src/utils/content-pages.ts`：About/Bio 数据构建工具
 - `src/styles/article-prose-base.css`：文章正文共享排版样式
 - `astro.config.mjs`：Astro 配置（支持 `site` 与 `base`）
@@ -73,3 +77,26 @@ npm run build
 可参考模板 `templates/new-post-template.md`。
 
 如果后续 agent 需要按同一规则排版，请使用项目内 skill：`skills/post-image-layout/SKILL.md`。
+
+## 动态（Moments）
+
+动态用于记录短句与照片，只在列表中出现，不生成可点击进入的详情页。它们会出现在首页 `All` 时间线中，也可以从 `Moments` 归档单独查看；分类页与搜索、RSS 仍只包含文章。
+
+在 `src/content/moments/` 下新建 `.md` 文件，Frontmatter 字段如下：
+
+- `text`（必填）：几句话的文字，换行会保留
+- `date`（必填）：发布日期，用于排序，例如 `2026-11-01`
+- `title`（可选）：动态标题；不填则只显示文字
+- `images`（可选）：图片数组，每项为 `{ src, alt }`；`src` 放在 `public/images/` 下
+- `tags`（可选）：标签数组，会出现在侧栏筛选与卡片底部
+- `listDate`（可选）：列表日期文案；不填则自动生成 `Nov 1, 2026` 格式
+- `draft`（可选）：`true` 时不展示
+
+图片排版会根据图片数量自动选择：
+
+- 0 张：纯文字卡片
+- 1 张：16:10 宽幅
+- 2 张或 4 张：两列
+- 3 张及以上（非 4 张）：三列方格，手机上保持三列缩略图
+
+可参考模板 `templates/new-moment-template.md`。

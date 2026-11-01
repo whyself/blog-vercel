@@ -1,0 +1,51 @@
+---
+import type { MomentCardData } from '../utils/archive';
+
+interface Props {
+  card: MomentCardData;
+}
+
+const { card } = Astro.props as Props;
+const tagData = card.tags.join('||');
+const imageCount = card.images.length;
+const imageGridClass =
+  imageCount === 1 ? 'grid-cols-1' : imageCount === 2 || imageCount === 4 ? 'grid-cols-2' : 'grid-cols-3';
+const imageAspectClass =
+  imageCount === 1 ? 'aspect-[16/10]' : imageCount === 2 || imageCount === 4 ? 'aspect-[4/3]' : 'aspect-square';
+---
+
+<article class="group" data-list-date={card.listDate} data-moment-card data-tags={tagData}>
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+    <span class="inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+      <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+      Moment
+    </span>
+    <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{card.listDate}</span>
+  </div>
+  {card.title && (
+    <h3 class="mt-4 font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface">{card.title}</h3>
+  )}
+  <p class="serif-text mt-3 text-lg leading-relaxed text-on-surface-variant max-w-2xl whitespace-pre-line">{card.text}</p>
+  {imageCount > 0 && (
+    <div class={`mt-6 grid max-w-3xl gap-2 ${imageGridClass}`}>
+      {card.images.map((image) => (
+        <figure class={`relative overflow-hidden rounded-sm bg-surface-container ${imageAspectClass}`}>
+          <img
+            alt={image.alt}
+            class="w-full h-full object-cover"
+            decoding="async"
+            loading="lazy"
+            src={image.src}
+          />
+        </figure>
+      ))}
+    </div>
+  )}
+  {card.tags.length > 0 && (
+    <div class="flex flex-wrap gap-2 pt-5">
+      {card.tags.map((tag) => (
+        <span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
+      ))}
+    </div>
+  )}
+</article>
