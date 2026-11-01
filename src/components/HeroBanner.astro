@@ -3,10 +3,12 @@ const {
   base = import.meta.env.BASE_URL,
   alt = "Hero background",
   title = "",
+  profileOverlay = false,
 } = Astro.props as {
   base?: string;
   alt?: string;
   title?: string;
+  profileOverlay?: boolean;
 };
 
 const lightAvifSet = `${base}images/hero/blog-hero-light-768.avif 768w, ${base}images/hero/blog-hero-light-1280.avif 1280w, ${base}images/hero/blog-hero-light-1920.avif 1920w`;
@@ -26,7 +28,10 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
     data-lqip-light={lightLqip}
     style={`background-image: url('${lightLqip}')`}
   ></div>
-  <picture data-hero-picture>
+  <picture
+    class:list={[profileOverlay && "block h-[var(--mobile-hero-h)] lg:h-auto"]}
+    data-hero-picture
+  >
     <source
       data-avif-dark={darkAvifSet}
       data-avif-light={lightAvifSet}
@@ -43,7 +48,10 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
     />
     <img
       alt={alt}
-      class="w-full h-auto block"
+      class:list={[
+        "block w-full",
+        profileOverlay ? "h-full object-cover lg:h-auto" : "h-auto",
+      ]}
       data-fallback-dark={`${base}images/hero/blog-hero-dark-1280.webp`}
       data-fallback-light={`${base}images/hero/blog-hero-light-1280.webp`}
       decoding="async"
@@ -57,8 +65,11 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
     />
   </picture>
   <div class="absolute inset-0 z-[1] bg-zinc-950/10"></div>
-  <div class="hero-fade absolute inset-x-0 bottom-0 z-[2] h-24 md:h-36"></div>
-  <div class="absolute bottom-0 left-0 z-[3] w-full p-8 md:p-12">
+  {profileOverlay && (
+    <div class="hero-profile-wash pointer-events-none absolute inset-0 z-[2] lg:hidden" aria-hidden="true"></div>
+  )}
+  <div class="hero-fade absolute inset-x-0 bottom-0 z-[3] h-24 md:h-36"></div>
+  <div class="absolute bottom-0 left-0 z-[4] w-full p-8 md:p-12">
     {title && (
       <h1
         class="font-load-hidden text-5xl md:text-8xl font-semibold text-on-surface leading-none"
@@ -86,6 +97,31 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
       rgba(26, 26, 26, 0.88),
       rgba(26, 26, 26, 0.46),
       transparent
+    );
+  }
+
+  /* Soft page-coloured haze under the mobile profile so the photo never
+     fights the text. Kept radial so it blends into the sky instead of
+     looking like a card. */
+  .hero-profile-wash {
+    background: radial-gradient(
+      ellipse 64% 84% at 100% 82%,
+      rgba(249, 249, 249, 0.95) 0%,
+      rgba(249, 249, 249, 0.84) 34%,
+      rgba(249, 249, 249, 0.52) 62%,
+      rgba(249, 249, 249, 0.2) 82%,
+      rgba(249, 249, 249, 0) 100%
+    );
+  }
+
+  :global(html.dark) .hero-profile-wash {
+    background: radial-gradient(
+      ellipse 64% 84% at 100% 82%,
+      rgba(26, 26, 26, 0.96) 0%,
+      rgba(26, 26, 26, 0.86) 34%,
+      rgba(26, 26, 26, 0.58) 62%,
+      rgba(26, 26, 26, 0.24) 82%,
+      rgba(26, 26, 26, 0) 100%
     );
   }
 </style>

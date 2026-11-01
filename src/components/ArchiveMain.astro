@@ -52,8 +52,8 @@ const resolveHref = (href: string) => {
 
 <body class="bg-surface text-on-surface selection:bg-primary-container selection:text-white">
 <TopActions searchItems={searchItems} />
-<HeroBanner base={base} title="Blog" />
-<main class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row min-h-screen lg:py-12" data-content-start>
+<HeroBanner base={base} title="Blog" profileOverlay />
+<main class="relative max-w-screen-2xl mx-auto flex flex-col lg:flex-row min-h-screen lg:py-12" data-content-start>
 <ProfileSidebar active="home" />
 <section class="min-w-0 flex-1 lg:-ml-16 lg:pl-0 lg:pr-0 py-4 md:py-12 lg:py-0">
 <div class="w-full mx-0 px-6 md:px-8 lg:pl-14 lg:pr-10 py-8 md:py-10 bg-surface-container-lowest border border-surface-container-high rounded-sm">
@@ -399,5 +399,5 @@ const resolveHref = (href: string) => {
     updatePager(Math.max(1, initialTotalPages));
   })();
 </script>
-<InitialViewportScript />
+<InitialViewportScript skipOnMobile />
 </body>

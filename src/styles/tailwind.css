@@ -9,3 +9,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Mobile-only hero height; the profile block overlays this area. */
+    --mobile-hero-h: clamp(19rem, 84vw, 23rem);
+  }
+}
