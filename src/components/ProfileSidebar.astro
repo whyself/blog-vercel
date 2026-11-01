@@ -5,23 +5,26 @@ const base = import.meta.env.BASE_URL;
 // 友联（Links）入口已隐藏：页面、内容与类型定义全部保留，改回 true 即可恢复侧栏入口。
 const showLinksNav = false;
 
-// 移动端（<lg）把整块叠到首屏背景图右侧：位置由 HeroBanner 的
-// --mobile-hero-h 决定，因此这两处需要在同一页面一起使用。
-
+// 移动端（<lg）把这块拆成左上、右下两个角：
+// - 导航放在左上角，与右上角的搜索/主题/订阅图标同一条线；
+// - 身份信息（头像/名字/签名/社交）贴右下角，与首屏标题同一底线。
+// 位置依赖 HeroBanner 的 --mobile-hero-h 以及标题的字号/内边距。
 const navClass = (key: string) =>
   `inline-flex items-center transition-all duration-200 ease-out transform hover:-translate-y-1 ${
-    active === key ? 'font-bold text-on-surface' : 'text-outline hover:text-on-surface'
+    active === key
+      ? 'font-bold text-on-surface'
+      : 'text-on-surface-variant hover:text-on-surface lg:text-outline lg:hover:text-on-surface'
   }`;
 ---
 
-<aside class="pointer-events-none absolute right-0 top-[calc(-1*var(--mobile-hero-h))] z-10 flex h-[var(--mobile-hero-h)] w-full flex-col items-end justify-end space-y-3 pl-0 pr-8 pb-8 pt-0 text-right lg:pointer-events-auto lg:sticky lg:top-11 lg:right-auto lg:z-auto lg:h-fit lg:w-80 lg:items-stretch lg:justify-start lg:space-y-12 lg:px-12 lg:pb-12 lg:pt-10 lg:text-left">
-  <div class="pointer-events-auto flex flex-col items-end space-y-2 lg:items-start lg:space-y-3">
-    <div class="h-16 w-16 overflow-hidden rounded-sm bg-surface-container-highest shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-white/60 lg:h-24 lg:w-24 lg:shadow-none lg:ring-0">
+<aside class="pointer-events-none absolute right-0 top-[calc(-1*var(--mobile-hero-h))] z-10 h-[var(--mobile-hero-h)] w-full lg:pointer-events-auto lg:sticky lg:top-11 lg:right-auto lg:z-auto lg:flex lg:h-fit lg:w-80 lg:flex-col lg:items-stretch lg:space-y-12 lg:px-12 lg:pb-12 lg:pt-10 lg:text-left">
+  <div class="pointer-events-auto absolute right-8 bottom-8 flex flex-col items-end space-y-2 md:bottom-12 lg:static lg:right-auto lg:bottom-auto lg:items-start lg:space-y-3">
+    <div class="h-12 w-12 overflow-hidden rounded-sm bg-surface-container-highest shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-white/60 lg:h-24 lg:w-24 lg:shadow-none lg:ring-0">
       <img alt="whyself" class="h-full w-full object-cover" decoding="async" height="96" loading="lazy" src={`${base}images/profile-avatar.jpg`} width="96" />
     </div>
     <div class="flex flex-col items-end lg:items-start">
       <h2 class="font-headline font-black uppercase text-sm tracking-widest text-on-surface">whyself</h2>
-      <p class="font-body italic text-base text-on-surface-variant lg:text-lg">Racing with death.</p>
+      <p class="font-body italic text-sm text-on-surface-variant lg:text-lg">Racing with death.</p>
       <div class="mt-2 flex items-center justify-end gap-2 text-outline lg:justify-start">
         <a
           aria-label="GitHub"
@@ -30,12 +33,12 @@ const navClass = (key: string) =>
           rel="noopener noreferrer"
           target="_blank"
         >
-          <svg aria-hidden="true" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <svg aria-hidden="true" class="w-4 h-4 fill-current lg:w-5 lg:h-5" viewBox="0 0 24 24">
             <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.9.58.11.79-.25.79-.56v-1.97c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.74 2.67 1.24 3.33.95.1-.74.4-1.24.73-1.53-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.73 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.28 5.69.41.36.78 1.07.78 2.16v3.19c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
           </svg>
         </a>
         <a aria-label="Email" class="hover:text-on-surface transition-colors duration-200" href="mailto:251502023@smail.nju.edu.cn">
-          <svg aria-hidden="true" class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24">
+          <svg aria-hidden="true" class="w-4 h-4 stroke-current fill-none lg:w-5 lg:h-5" viewBox="0 0 24 24">
             <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
             <path d="m22 8-10 7L2 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
           </svg>
@@ -43,7 +46,7 @@ const navClass = (key: string) =>
       </div>
     </div>
   </div>
-  <nav class="font-load-hidden pointer-events-auto flex flex-col items-end gap-y-1 font-body italic text-base leading-none lg:items-start lg:gap-0 lg:space-y-6 lg:text-xl">
+  <nav class="font-load-hidden pointer-events-auto absolute left-8 top-8 flex flex-row items-center gap-x-3 font-body italic text-base leading-none lg:static lg:left-auto lg:top-auto lg:flex-col lg:items-start lg:gap-0 lg:space-y-6 lg:text-xl">
     <a class={navClass('home')} href={base}><span>Home</span></a>
     <a class={navClass('bio')} href={`${base}bio/`}><span>Bio</span></a>
     <a class={navClass('about')} href={`${base}about/`}><span>About</span></a>
