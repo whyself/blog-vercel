@@ -16,15 +16,8 @@ const imageAspectClass =
 
 <article class="group" data-list-date={card.listDate} data-moment-card data-tags={tagData}>
   <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-    <span class="inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-      <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-      Moment
-    </span>
     <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{card.listDate}</span>
   </div>
-  {card.title && (
-    <h3 class="mt-4 font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface">{card.title}</h3>
-  )}
   <p class="serif-text mt-3 text-lg leading-relaxed text-on-surface-variant max-w-2xl whitespace-pre-line">{card.text}</p>
   {imageCount > 0 && (
     <div class={`mt-6 grid max-w-3xl gap-2 ${imageGridClass}`}>

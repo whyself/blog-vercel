@@ -25,7 +25,6 @@ export interface MomentCardImage {
 export interface MomentCardData {
   kind: 'moment';
   id: string;
-  title: string;
   text: string;
   listDate: string;
   tags: string[];
@@ -75,8 +74,8 @@ const toCanonicalPath = (route: ArchiveRoute, currentPage: number): string => {
   return `${config.sectionPath}/page/${currentPage}/`;
 };
 
-export function getMomentImageAlt(moment: MomentEntry, alt: string | undefined): string {
-  return alt?.trim() || moment.data.title?.trim() || 'Moment image';
+export function getMomentImageAlt(alt: string | undefined): string {
+  return alt?.trim() || 'Moment image';
 }
 
 export function toPostCardData(post: PostEntry, base: string): PostCardData {
@@ -97,13 +96,12 @@ export function toMomentCardData(moment: MomentEntry): MomentCardData {
   return {
     kind: 'moment',
     id: moment.id,
-    title: moment.data.title?.trim() ?? '',
     text: moment.data.text.trim(),
     listDate: moment.data.listDate?.trim() || formatMomentListDate(moment.data.date),
     tags: moment.data.tags ?? [],
     images: (moment.data.images ?? []).map((image) => ({
       src: image.src,
-      alt: getMomentImageAlt(moment, image.alt),
+      alt: getMomentImageAlt(image.alt),
     })),
   };
 }

@@ -44,7 +44,6 @@ const pages = defineCollection({
 const moments = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/moments' }),
   schema: z.object({
-    title: z.string().optional(),
     text: z.string(),
     date: z.coerce.date(),
     listDate: z.string().optional(),
