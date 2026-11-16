@@ -28,3 +28,6 @@ Thumbs.db
 .vscode/
 .idea/
 .vercel
+
+# Local debug browser profile (contains copied cookies, never commit)
+.chrome-debug/
