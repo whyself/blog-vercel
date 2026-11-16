@@ -9,7 +9,7 @@ tags:
   - 全双工
   - 语音交互
 majorCategory: Articles
-thumbnail: "/images/posts/full-duplex-model/full-duplex-model-03.png"
+thumbnail: "/images/posts/full-duplex-model/ttds-preview.jpg"
 draft: false
 ---
 
