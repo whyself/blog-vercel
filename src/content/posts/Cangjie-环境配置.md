@@ -1,5 +1,5 @@
 ---
-title: "Cangjie01-环境配置"
+title: "Cangjie-环境配置"
 excerpt: "记录在 Ubuntu 24.04 上安装仓颉工具链、配置 VS Code 插件，以及让仓颉项目获得完整补全的过程。"
 publishDate: 2026-04-17
 listDate: "Apr 17, 2026"
