@@ -17,38 +17,42 @@ const tagData = card.tags.join('||');
   data-word-count={card.wordCount}
 >
   {card.thumbnail ? (
-    <div class="flex flex-col md:flex-row md:items-start gap-8">
-      <div class="flex-1 space-y-4 order-2 md:order-1">
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{card.listDate}</span>
-          <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
-          <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{card.wordCount}</span>
+    <div class="space-y-4">
+      <div class="flex flex-col md:flex-row lg:flex-col xl:flex-row md:items-start lg:items-stretch xl:items-start gap-6 xl:gap-8">
+        <div class="min-w-0 flex-1 space-y-4 order-2 md:order-1 lg:order-2 xl:order-1">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{card.listDate}</span>
+            <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+            <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{card.wordCount}</span>
+          </div>
+          <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
+            <a class="hover:opacity-80 transition-opacity" href={card.href}>{card.title}</a>
+          </h3>
+          <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">{card.excerpt}</p>
         </div>
-        <h3 class="font-headline font-bold text-2xl md:text-3xl tracking-tight text-on-surface group-hover:underline underline-offset-8 transition-all">
-          <a class="hover:opacity-80 transition-opacity" href={card.href}>{card.title}</a>
-        </h3>
-        <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">{card.excerpt}</p>
-        <div class="flex space-x-2 pt-2">
+        <div class="w-full md:w-48 lg:w-full xl:w-48 h-48 bg-surface-container shrink-0 order-1 md:order-2 lg:order-1 xl:order-2 overflow-hidden">
+          <img
+            alt={card.title}
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            decoding="async"
+            height="192"
+            loading="lazy"
+            src={card.thumbnail}
+            width="192"
+          />
+        </div>
+      </div>
+      {card.tags.length > 0 && (
+        <div class="flex flex-wrap items-center gap-2 pt-1">
           {card.tags.map((tag) => (
-            <span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
+            <span class="whitespace-nowrap shrink-0 px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
           ))}
         </div>
-      </div>
-      <div class="w-full md:w-48 h-48 bg-surface-container shrink-0 order-1 md:order-2 overflow-hidden">
-        <img
-          alt={card.title}
-          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          decoding="async"
-          height="192"
-          loading="lazy"
-          src={card.thumbnail}
-          width="192"
-        />
-      </div>
+      )}
     </div>
   ) : (
-    <div class="flex flex-col md:flex-row md:items-start gap-8">
-      <div class="flex-1 space-y-4">
+    <div class="space-y-4">
+      <div class="min-w-0 space-y-4">
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
           <span class="font-label text-[10px] uppercase tracking-[0.2em] text-outline">{card.listDate}</span>
           <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
@@ -58,12 +62,14 @@ const tagData = card.tags.join('||');
           <a href={card.href}>{card.title}</a>
         </h3>
         <p class="serif-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">{card.excerpt}</p>
-        <div class="flex space-x-2 pt-2">
+      </div>
+      {card.tags.length > 0 && (
+        <div class="flex flex-wrap items-center gap-2 pt-1">
           {card.tags.map((tag) => (
-            <span class="px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
+            <span class="whitespace-nowrap shrink-0 px-4 py-1.5 border border-surface-container-highest text-[9px] font-bold uppercase tracking-widest rounded-full text-on-surface-variant">{tag}</span>
           ))}
         </div>
-      </div>
+      )}
     </div>
   )}
 </article>

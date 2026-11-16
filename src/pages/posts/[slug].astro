@@ -157,8 +157,6 @@ const articleJsonLd = {
   .article-body :global(blockquote) {
     font-size: 0.98rem;
     line-height: var(--body-line);
-    color: #4b5563;
-    border-left: 3px solid #d0d7de;
     padding-left: 0.9em;
     margin: 0.95em 0 !important;
   }
@@ -480,7 +478,7 @@ const articleJsonLd = {
               <span class="text-outline-variant">|</span>
               <span class="font-headline text-[11px] tracking-wide text-on-surface-variant break-words">{post.data.articleDate ?? post.data.listDate}</span>
               {post.data.tags.map((tag) => (
-                <span class="px-3 py-1 bg-surface-container-high text-[10px] font-headline font-bold uppercase tracking-widest rounded-full max-w-full break-words">{tag}</span>
+                <span class="whitespace-nowrap px-3 py-1 bg-surface-container-high text-[10px] font-headline font-bold uppercase tracking-widest rounded-full max-w-full">{tag}</span>
               ))}
             </div>
           </div>
