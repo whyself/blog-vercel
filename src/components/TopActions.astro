@@ -148,7 +148,8 @@ const base = import.meta.env.BASE_URL;
         }
       };
 
-      if (!document.startViewTransition) {
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      if (!document.startViewTransition || reduceMotion || document.visibilityState !== "visible") {
         applyTheme(nextTheme);
         persistTheme();
         return;

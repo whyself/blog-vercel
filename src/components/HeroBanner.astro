@@ -20,55 +20,90 @@ const lightLqip = "data:image/webp;base64,UklGRrwAAABXRUJQVlA4ILAAAABQBgCdASooAB
 const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABcAPvVgqU6qpSOiMBqqqVAeiWIAp0d2xeALvfhKVM2cbuGHJPQ8NdiEQdEWKJuZQebpgAD3H9AGMKwVMcjgJqJOpHBmsPDXHjBLvGXx7LwOjb8pjDSkduUtFgtlrCMEQAhQI/wJ0Strse3+iNwElO/meMC5QAqJ9uu7/8bqlyj0YxOt1CBfA5v2eCwAAAA=";
 ---
 
-<section class="w-full relative overflow-visible bg-surface-dim" data-hero>
-  <div
-    class="absolute inset-0 bg-center bg-cover scale-105 blur-xl transition-opacity duration-500"
-    data-hero-lqip
-    data-lqip-dark={darkLqip}
-    data-lqip-light={lightLqip}
-    style={`background-image: url('${lightLqip}')`}
-  ></div>
-  <picture
-    class:list={[profileOverlay && "block h-[var(--mobile-hero-h)] lg:h-auto"]}
-    data-hero-picture
-  >
-    <source
-      data-avif-dark={darkAvifSet}
-      data-avif-light={lightAvifSet}
-      sizes="100vw"
-      srcset={transparentPixel}
-      type="image/avif"
-    />
-    <source
-      data-webp-dark={darkWebpSet}
-      data-webp-light={lightWebpSet}
-      sizes="100vw"
-      srcset={transparentPixel}
-      type="image/webp"
-    />
-    <img
-      alt={alt}
-      class:list={[
-        "block w-full",
-        profileOverlay ? "h-full object-cover lg:h-auto" : "h-auto",
-      ]}
-      data-fallback-dark={`${base}images/hero/blog-hero-dark-1280.webp`}
-      data-fallback-light={`${base}images/hero/blog-hero-light-1280.webp`}
-      decoding="async"
-      fetchpriority="high"
-      height="1536"
-      id="hero-main-image"
-      loading="eager"
-      sizes="100vw"
-      src={transparentPixel}
-      width="2722"
-    />
-  </picture>
-  <div class="absolute inset-0 z-[1] bg-zinc-950/10"></div>
+<section class="w-full relative overflow-hidden bg-surface-dim" data-hero>
+  <div class="hero-layer hero-layer--light relative w-full" data-hero-layer="light">
+    <div
+      class="absolute inset-0 bg-center bg-cover scale-105 blur-xl transition-opacity duration-500"
+      data-hero-lqip="light"
+      style={`background-image: url('${lightLqip}')`}
+    ></div>
+    <picture
+      class:list={[profileOverlay && "block h-[var(--mobile-hero-h)] lg:h-auto"]}
+      data-hero-picture="light"
+    >
+      <source
+        data-srcset={lightAvifSet}
+        sizes="100vw"
+        srcset={transparentPixel}
+        type="image/avif"
+      />
+      <source
+        data-srcset={lightWebpSet}
+        sizes="100vw"
+        srcset={transparentPixel}
+        type="image/webp"
+      />
+      <img
+        alt={alt}
+        class:list={[
+          "relative block w-full transition-opacity duration-500 opacity-0",
+          profileOverlay ? "h-full object-cover lg:h-auto" : "h-auto",
+        ]}
+        data-src={`${base}images/hero/blog-hero-light-1280.webp`}
+        decoding="async"
+        fetchpriority="high"
+        height="1536"
+        id="hero-main-image"
+        loading="eager"
+        sizes="100vw"
+        src={transparentPixel}
+        width="2722"
+      />
+    </picture>
+  </div>
+
+  <div class="hero-layer hero-layer--dark absolute inset-0 w-full h-full" data-hero-layer="dark">
+    <div
+      class="absolute inset-0 bg-center bg-cover scale-105 blur-xl transition-opacity duration-500"
+      data-hero-lqip="dark"
+      style={`background-image: url('${darkLqip}')`}
+    ></div>
+    <picture
+      class="block w-full h-full"
+      data-hero-picture="dark"
+    >
+      <source
+        data-srcset={darkAvifSet}
+        sizes="100vw"
+        srcset={transparentPixel}
+        type="image/avif"
+      />
+      <source
+        data-srcset={darkWebpSet}
+        sizes="100vw"
+        srcset={transparentPixel}
+        type="image/webp"
+      />
+      <img
+        alt={alt}
+        class="relative block w-full h-full object-cover transition-opacity duration-500 opacity-0"
+        data-src={`${base}images/hero/blog-hero-dark-1280.webp`}
+        decoding="async"
+        fetchpriority="auto"
+        height="1536"
+        loading="eager"
+        sizes="100vw"
+        src={transparentPixel}
+        width="2722"
+      />
+    </picture>
+  </div>
+
+  <div class="absolute inset-0 z-[1] bg-zinc-950/10 pointer-events-none"></div>
   {profileOverlay && (
     <div class="hero-profile-wash pointer-events-none absolute inset-0 z-[2] lg:hidden" aria-hidden="true"></div>
   )}
-  <div class="hero-fade absolute inset-x-0 bottom-0 z-[3] h-24 md:h-36"></div>
+  <div class="hero-fade absolute inset-x-0 bottom-0 z-[3] h-24 md:h-36 pointer-events-none"></div>
   <div class="absolute bottom-0 left-0 z-[4] w-full p-8 md:p-12">
     {title && (
       <h1
@@ -82,6 +117,25 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
 </section>
 
 <style>
+  .hero-layer--light {
+    opacity: 1;
+  }
+
+  .hero-layer--dark {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global(html.dark) .hero-layer--light {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global(html.dark) .hero-layer--dark {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .hero-fade {
     background: linear-gradient(
       to top,
@@ -128,61 +182,83 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
 
 <script is:inline>
   (() => {
-    const picture = document.querySelector("[data-hero-picture]");
-    if (!picture) return;
+    const heroRoot = document.querySelector("[data-hero]");
+    if (!heroRoot) return;
 
-    const sources = Array.from(picture.querySelectorAll("source"));
-    const img = picture.querySelector("img");
-    const lqipLayer = document.querySelector("[data-hero-lqip]");
-    if (!img) return;
+    const layers = {
+      light: heroRoot.querySelector('[data-hero-layer="light"]'),
+      dark: heroRoot.querySelector('[data-hero-layer="dark"]'),
+    };
 
-    let hasLoadedOnce = false;
+    const activated = { light: false, dark: false };
 
-    const applyHeroTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      sources.forEach((source) => {
-        if (source.type === "image/avif") {
-          source.srcset = isDark
-            ? source.dataset.avifDark || ""
-            : source.dataset.avifLight || "";
-        } else if (source.type === "image/webp") {
-          source.srcset = isDark
-            ? source.dataset.webpDark || ""
-            : source.dataset.webpLight || "";
-        }
-      });
-      if (lqipLayer) {
-        const lqipSrc = isDark
-          ? lqipLayer.dataset.lqipDark || ""
-          : lqipLayer.dataset.lqipLight || "";
-        lqipLayer.style.backgroundImage = `url('${lqipSrc}')`;
+    const revealLayer = (layer) => {
+      const img = layer?.querySelector("img");
+      const lqip = layer?.querySelector("[data-hero-lqip]");
+      if (img) {
+        img.classList.remove("opacity-0");
+        img.classList.add("opacity-100");
       }
-      img.src = isDark ? img.dataset.fallbackDark || "" : img.dataset.fallbackLight || "";
-
-      // Only show LQIP fade-in for the very first hero load.
-      // On theme switches, keep current image visible to avoid flash.
-      if (!hasLoadedOnce) {
-        img.classList.remove("opacity-100");
-        img.classList.add("opacity-0");
-        if (lqipLayer) {
-          lqipLayer.classList.remove("opacity-0");
-          lqipLayer.classList.add("opacity-100");
-        }
+      if (lqip) {
+        lqip.classList.remove("opacity-100");
+        lqip.classList.add("opacity-0");
       }
     };
 
-    img.classList.add("transition-opacity", "duration-500", "opacity-0");
-    img.addEventListener("load", () => {
-      hasLoadedOnce = true;
-      img.classList.remove("opacity-0");
-      img.classList.add("opacity-100");
-      if (lqipLayer) {
-        lqipLayer.classList.remove("opacity-100");
-        lqipLayer.classList.add("opacity-0");
-      }
-    });
+    const activateLayer = (theme) => {
+      if (activated[theme]) return;
+      const layer = layers[theme];
+      if (!layer) return;
+      activated[theme] = true;
 
-    applyHeroTheme();
-    document.addEventListener("themechange", applyHeroTheme);
+      const sources = Array.from(layer.querySelectorAll("source"));
+      const img = layer.querySelector("img");
+      if (!img) return;
+
+      const markReady = () => {
+        if (img.currentSrc && !img.currentSrc.startsWith("data:image/gif")) {
+          revealLayer(layer);
+        } else if (img.naturalWidth > 1) {
+          revealLayer(layer);
+        }
+      };
+
+      img.addEventListener("load", markReady);
+      sources.forEach((source) => {
+        if (source.dataset.srcset) source.srcset = source.dataset.srcset;
+      });
+      if (img.dataset.src) img.src = img.dataset.src;
+
+      if (img.complete) markReady();
+    };
+
+    const getTheme = () => (document.documentElement.classList.contains("dark") ? "dark" : "light");
+
+    const initialTheme = getTheme();
+    const alternateTheme = initialTheme === "dark" ? "light" : "dark";
+    let preloadTriggered = false;
+
+    const triggerAlternatePreload = () => {
+      if (preloadTriggered) return;
+      preloadTriggered = true;
+      activateLayer(alternateTheme);
+    };
+
+    const initialLayer = layers[initialTheme];
+    const initialImg = initialLayer?.querySelector("img");
+    if (initialImg) {
+      initialImg.addEventListener("load", () => {
+        if (initialImg.currentSrc && !initialImg.currentSrc.startsWith("data:image/gif")) {
+          triggerAlternatePreload();
+        }
+      });
+    }
+
+    activateLayer(initialTheme);
+    window.setTimeout(triggerAlternatePreload, 500);
+
+    document.addEventListener("themechange", () => {
+      activateLayer(getTheme());
+    });
   })();
 </script>

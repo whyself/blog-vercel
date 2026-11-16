@@ -8,7 +8,7 @@ tags:
   - DSH
   - 全双工
   - 语音交互
-  - AGENT
+  - Agent
 majorCategory: Articles
 thumbnail: "/images/posts/full-duplex-model/ttds-preview.jpg"
 draft: false

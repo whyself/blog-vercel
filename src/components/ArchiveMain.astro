@@ -296,10 +296,16 @@ const resolveHref = (href: string) => {
       return state.items;
     };
 
+    const normalizeTagKey = (tag) => String(tag || "").trim().toLowerCase();
+
     const getWorkingItems = () => state.items;
 
     const getFilteredItems = () =>
-      getWorkingItems().filter((item) => state.tag === "all" || (item.tags || []).includes(state.tag));
+      getWorkingItems().filter(
+        (item) =>
+          state.tag === "all" ||
+          (item.tags || []).some((tag) => normalizeTagKey(tag) === state.tag),
+      );
 
     const getTotalPages = (filteredItems) => Math.max(1, Math.ceil(filteredItems.length / pageSize));
 
@@ -355,10 +361,17 @@ const resolveHref = (href: string) => {
     };
 
     const renderTagButtons = () => {
-      const tagSet = new Set();
-      getWorkingItems().forEach((item) => (item.tags || []).forEach((tag) => tagSet.add(tag)));
-      const tags = Array.from(tagSet).sort((a, b) => a.localeCompare(b));
-      if (state.tag !== "all" && !tags.includes(state.tag)) state.tag = "all";
+      const tagMap = new Map();
+      getWorkingItems().forEach((item) =>
+        (item.tags || []).forEach((tag) => {
+          const key = normalizeTagKey(tag);
+          if (key && !tagMap.has(key)) {
+            tagMap.set(key, String(tag).trim());
+          }
+        }),
+      );
+      const tags = Array.from(tagMap.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+      if (state.tag !== "all" && !tagMap.has(state.tag)) state.tag = "all";
       tagContainer.innerHTML = "";
 
       const buildTagButton = (label, value, active) => {
@@ -379,7 +392,7 @@ const resolveHref = (href: string) => {
       };
 
       tagContainer.appendChild(buildTagButton("All", "all", state.tag === "all"));
-      tags.forEach((tag) => tagContainer.appendChild(buildTagButton(tag, tag, state.tag === tag)));
+      tags.forEach(([key, label]) => tagContainer.appendChild(buildTagButton(label, key, state.tag === key)));
     };
 
     prevLink.addEventListener("click", (event) => {
