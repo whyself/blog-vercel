@@ -7,7 +7,9 @@ import SiteFooter from '../components/SiteFooter.astro';
 import TopActions from '../components/TopActions.astro';
 import PageHead from '../components/PageHead.astro';
 import type { SearchItem } from '../utils/posts';
+import CodeBlockEnhancer from '../components/CodeBlockEnhancer.astro';
 import '../styles/article-prose-base.css';
+import '../styles/code-block.css';
 
 interface Props {
   base: string;
@@ -70,6 +72,7 @@ const {
   </main>
   <SiteFooter />
   <ScrollTopButton />
+  <CodeBlockEnhancer />
   <InitialViewportScript skipOnMobile />
 </body>
 </html>

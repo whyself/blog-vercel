@@ -1,0 +1,129 @@
+<script is:inline>
+  (() => {
+    const COPY_ICON =
+      '<svg aria-hidden="true" fill="none" viewBox="0 0 24 24"><rect x="8.2" y="7.2" width="10.5" height="12" rx="1.8" stroke="currentColor" stroke-width="1.8"></rect><path d="M5.3 15.3H4.8a1.8 1.8 0 0 1-1.8-1.8V4.8A1.8 1.8 0 0 1 4.8 3h8.7a1.8 1.8 0 0 1 1.8 1.8v.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path></svg>';
+    const CHECK_ICON =
+      '<svg aria-hidden="true" fill="none" viewBox="0 0 24 24"><path d="m5 12 4.2 4.2L19 6.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>';
+    const ERROR_ICON =
+      '<svg aria-hidden="true" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"></circle><path d="M12 7.5v5.3M12 16h.01" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path></svg>';
+
+    const readRawCode = (shell) => {
+      const stored = shell.getAttribute("data-raw-code");
+      if (stored !== null) return stored;
+      const lines = Array.from(shell.querySelectorAll(".cb-lc"));
+      if (lines.length > 0) return lines.map((node) => node.textContent || "").join("\n");
+      return shell.querySelector("pre code")?.textContent || "";
+    };
+
+    const collapseListeners = new WeakMap();
+
+    const setCollapsedState = (shell, collapse) => {
+      const body = shell.querySelector(".code-block-body");
+      const toggle = shell.querySelector(".code-block-toggle");
+      if (!(body instanceof HTMLElement)) return;
+
+      const prevListener = collapseListeners.get(body);
+      if (prevListener) {
+        body.removeEventListener("transitionend", prevListener);
+        collapseListeners.delete(body);
+      }
+
+      const updateButtonState = (isCollapsed) => {
+        if (toggle instanceof HTMLButtonElement) {
+          toggle.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+          toggle.setAttribute("aria-label", isCollapsed ? "Expand code block" : "Collapse code block");
+          toggle.title = isCollapsed ? "Expand code block" : "Collapse code block";
+        }
+      };
+
+      if (collapse) {
+        if (shell.classList.contains("is-collapsed")) return;
+        const currentHeight = body.scrollHeight;
+        body.style.maxHeight = `${currentHeight}px`;
+        void body.offsetHeight;
+        shell.classList.add("is-collapsed");
+        body.style.maxHeight = "";
+        updateButtonState(true);
+      } else {
+        if (!shell.classList.contains("is-collapsed")) return;
+        const collapsedHeight = body.getBoundingClientRect().height;
+        body.style.maxHeight = `${collapsedHeight}px`;
+        shell.classList.remove("is-collapsed");
+        const targetHeight = body.scrollHeight;
+        void body.offsetHeight;
+        body.style.maxHeight = `${targetHeight}px`;
+        updateButtonState(false);
+
+        const onEnd = (event) => {
+          if (event.propertyName !== "max-height") return;
+          if (!shell.classList.contains("is-collapsed")) {
+            body.style.maxHeight = "none";
+          }
+          body.removeEventListener("transitionend", onEnd);
+          collapseListeners.delete(body);
+        };
+        collapseListeners.set(body, onEnd);
+        body.addEventListener("transitionend", onEnd);
+      }
+    };
+
+    const shells = Array.from(document.querySelectorAll(".article-body .code-block-shell"));
+    shells.forEach((shell) => {
+      if (!(shell instanceof HTMLElement) || shell.dataset.cbReady === "true") return;
+      shell.dataset.cbReady = "true";
+
+      const copyBtn = shell.querySelector(".code-block-copy");
+      if (copyBtn instanceof HTMLButtonElement) {
+        let resetTimer = 0;
+        copyBtn.addEventListener("click", async () => {
+          window.clearTimeout(resetTimer);
+          try {
+            if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+            await navigator.clipboard.writeText(readRawCode(shell));
+            copyBtn.innerHTML = CHECK_ICON;
+            copyBtn.classList.add("is-copied");
+            copyBtn.classList.remove("is-error");
+          } catch {
+            copyBtn.innerHTML = ERROR_ICON;
+            copyBtn.classList.remove("is-copied");
+          }
+          resetTimer = window.setTimeout(() => {
+            copyBtn.innerHTML = COPY_ICON;
+            copyBtn.classList.remove("is-copied");
+          }, 1400);
+        });
+      }
+
+      const wrapBtn = shell.querySelector(".code-block-wrap");
+      if (wrapBtn instanceof HTMLButtonElement) {
+        wrapBtn.addEventListener("click", () => {
+          const nextWrapped = !shell.classList.contains("is-wrapped");
+          shell.classList.toggle("is-wrapped", nextWrapped);
+          wrapBtn.classList.toggle("is-active", nextWrapped);
+          wrapBtn.setAttribute("aria-pressed", nextWrapped ? "true" : "false");
+          const body = shell.querySelector(".code-block-body");
+          if (body instanceof HTMLElement && !shell.classList.contains("is-collapsed")) {
+            body.style.maxHeight = "none";
+          }
+        });
+      }
+
+      const toggleBtn = shell.querySelector(".code-block-toggle");
+      if (toggleBtn instanceof HTMLButtonElement) {
+        toggleBtn.addEventListener("click", () => {
+          const isCollapsed = shell.classList.contains("is-collapsed");
+          setCollapsedState(shell, !isCollapsed);
+        });
+      }
+
+      const fadeArea = shell.querySelector(".code-block-fade");
+      if (fadeArea instanceof HTMLElement) {
+        fadeArea.addEventListener("click", () => {
+          if (shell.classList.contains("is-collapsed")) {
+            setCollapsedState(shell, false);
+          }
+        });
+      }
+    });
+  })();
+</script>

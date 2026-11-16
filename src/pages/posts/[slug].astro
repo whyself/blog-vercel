@@ -1,6 +1,7 @@
 ﻿---
 import { getCollection, render } from 'astro:content';
 import "katex/dist/katex.min.css";
+import CodeBlockEnhancer from '../../components/CodeBlockEnhancer.astro';
 import HeroBanner from '../../components/HeroBanner.astro';
 import Icon from '../../components/Icon.astro';
 import InitialViewportScript from '../../components/InitialViewportScript.astro';
@@ -9,6 +10,7 @@ import ScrollTopButton from '../../components/ScrollTopButton.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import TopActions from '../../components/TopActions.astro';
 import '../../styles/article-prose-base.css';
+import '../../styles/code-block.css';
 import { buildSearchItems, getPublishedPosts, sortPostsByDateDesc } from '../../utils/posts';
 
 export async function getStaticPaths() {
@@ -180,42 +182,33 @@ const articleJsonLd = {
   .article-body :global(p + h4) {
     margin-top: 1.05em !important;
   }
-  .article-body :global(pre) {
-    background: #f6f8fa;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.65rem;
+  .article-body :global(.code-block-shell),
+  .article-body :global(.code-block-shell *) {
+    box-sizing: border-box;
+  }
+  .article-body :global(pre:not(.code-block-body > pre)) {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 0.625rem;
     padding: 1rem 1.1rem;
     margin: 1.25rem 0;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
     max-width: 100%;
     width: 100%;
     overflow-x: auto !important;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
   }
-  .article-body :global(pre.astro-code) {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  .article-body :global(.astro-code) {
-    max-width: 100%;
-    overflow-x: auto !important;
-    box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
-  }
-  .article-body :global(pre code) {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-size: 0.95rem;
-    line-height: 1.65;
-    color: #1f2937;
+  .article-body :global(pre:not(.code-block-body > pre) code) {
+    font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-variant-ligatures: none;
+    font-size: 0.8125rem;
+    line-height: 1.68;
+    color: #24292e;
     background: transparent;
     border: none;
     border-radius: 0;
     display: inline-block;
     padding: 0;
-    overflow-x: visible;
-    max-width: 100%;
-    box-sizing: border-box;
     min-width: 100%;
     box-shadow: none;
   }
@@ -223,68 +216,6 @@ const articleJsonLd = {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
-  }
-  .article-body :global(.code-block-shell) {
-    --code-block-bg: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.7rem;
-    background-color: var(--code-block-bg);
-    overflow-x: auto;
-    overflow-y: hidden;
-    margin: 1.5rem 0;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .article-body :global(.code-block-head) {
-    height: 2.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0.75rem 0 0.85rem;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .article-body :global(.code-block-lang) {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-size: 0.72rem;
-    line-height: 1;
-    color: #6b7280;
-    text-transform: lowercase;
-    letter-spacing: 0.02em;
-  }
-  .article-body :global(.code-block-copy) {
-    width: 1.7rem;
-    height: 1.7rem;
-    border: 1px solid #d0d7de;
-    background-color: var(--code-block-bg);
-    color: #24292f;
-    border-radius: 0.35rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .article-body :global(.code-block-copy:hover) {
-    background: #f3f4f6;
-  }
-  .article-body :global(.code-block-shell pre) {
-    margin: 0;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    background-color: var(--code-block-bg) !important;
-    padding: 0.9rem 1rem 1rem;
-    max-width: 100%;
-    overflow-x: auto !important;
-    box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
-  }
-  .article-body :global(.code-block-shell pre code),
-  .article-body :global(.code-block-shell pre .line),
-  .article-body :global(.code-block-shell pre span) {
-    background-color: transparent !important;
   }
   .article-body :global(table) {
     display: block;
@@ -475,32 +406,9 @@ const articleJsonLd = {
   html.dark .article-body {
     color: #d7e2ee;
   }
-  html.dark .article-body :global(pre) {
-    border-color: rgba(84, 84, 84, 0.65);
+  html.dark .article-body :global(pre:not(.code-block-body > pre)) {
+    border-color: rgba(255, 255, 255, 0.09);
     box-shadow: none;
-  }
-  html.dark .article-body :global(.code-block-shell) {
-    --code-block-bg: #22272e;
-    border-color: rgba(84, 84, 84, 0.65);
-    background-color: var(--code-block-bg);
-  }
-  html.dark .article-body :global(.code-block-head) {
-    background: #22272e;
-    border-bottom-color: rgba(84, 84, 84, 0.65);
-  }
-  html.dark .article-body :global(.code-block-shell pre) {
-    background-color: var(--code-block-bg) !important;
-  }
-  html.dark .article-body :global(.code-block-lang) {
-    color: rgba(235, 235, 235, 0.48);
-  }
-  html.dark .article-body :global(.code-block-copy) {
-    background-color: var(--code-block-bg);
-    color: rgba(235, 235, 235, 0.68);
-    border-color: rgba(84, 84, 84, 0.78);
-  }
-  html.dark .article-body :global(.code-block-copy:hover) {
-    background: #3f3f3f;
   }
   html.dark .article-body :global(.post-media figcaption) {
     color: rgba(235, 235, 235, 0.48);
@@ -537,18 +445,6 @@ const articleJsonLd = {
     .article-body :global(.post-media-grid--3) {
       --media-cols: 2;
     }
-    .article-body :global(pre.astro-code) {
-      width: min(100%, calc(100vw - 3rem)) !important;
-      max-width: min(100%, calc(100vw - 3rem)) !important;
-    }
-    .article-body :global(pre.astro-code code) {
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-      display: block;
-      width: 100%;
-      min-width: 0;
-    }
   }
   @media (max-width: 560px) {
     .article-body :global(.post-media-grid) {
@@ -574,7 +470,7 @@ const articleJsonLd = {
       </a>
     </nav>
     <div class="flex flex-col lg:flex-row lg:items-start gap-8 xl:gap-10">
-      <article class="flex-1 min-w-0 max-w-4xl mx-auto lg:mx-0 bg-transparent p-0 md:p-0 shadow-none overflow-x-hidden">
+      <article class="w-full flex-1 min-w-0 max-w-4xl mx-auto lg:mx-0 bg-transparent p-0 md:p-0 shadow-none overflow-x-hidden">
         <header class="mb-10">
           <h1 class="font-headline text-[1.75rem] md:text-[2.15rem] font-bold tracking-tight text-primary leading-tight mb-4 break-words">{title}</h1>
           <div class="flex flex-wrap items-start gap-3 mb-5 max-w-full">
@@ -744,52 +640,6 @@ const articleJsonLd = {
       closeImagePreview();
     });
 
-    const blocks = Array.from(document.querySelectorAll(".article-body pre"));
-    blocks.forEach((pre) => {
-      if (pre.parentElement?.classList.contains("code-block-shell")) return;
-      const code = pre.querySelector("code");
-      if (!code) return;
-
-      const className = code.className || "";
-      const matched = className.match(/language-([a-zA-Z0-9_-]+)/);
-      const rawLang = (pre.getAttribute("data-language") || code.getAttribute("data-language") || matched?.[1] || "").toLowerCase();
-      const lang = (rawLang === "text" || rawLang === "txt" || rawLang === "plaintext" || rawLang === "") ? "plain" : rawLang;
-      const rawText = code.textContent || "";
-
-      const shell = document.createElement("div");
-      shell.className = "code-block-shell";
-
-      const head = document.createElement("div");
-      head.className = "code-block-head";
-
-      const langNode = document.createElement("span");
-      langNode.className = "code-block-lang";
-      langNode.textContent = lang;
-
-      const copyBtn = document.createElement("button");
-      copyBtn.type = "button";
-      copyBtn.className = "code-block-copy";
-      copyBtn.innerHTML = iconSvg("content_copy");
-      copyBtn.title = "Copy code";
-      copyBtn.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(rawText);
-          copyBtn.innerHTML = iconSvg("check");
-          setTimeout(() => { copyBtn.innerHTML = iconSvg("content_copy"); }, 1200);
-        } catch {
-          copyBtn.innerHTML = iconSvg("error");
-          setTimeout(() => { copyBtn.innerHTML = iconSvg("content_copy"); }, 1200);
-        }
-      });
-
-      head.appendChild(langNode);
-      head.appendChild(copyBtn);
-      shell.appendChild(head);
-
-      pre.parentNode?.insertBefore(shell, pre);
-      shell.appendChild(pre);
-    });
-
     shareCopyButton?.addEventListener("click", async () => {
       const currentUrl = window.location.href;
 
@@ -868,6 +718,7 @@ const articleJsonLd = {
 
   })();
 </script>
+<CodeBlockEnhancer />
 <InitialViewportScript />
 </body></html>
 
