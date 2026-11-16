@@ -6,7 +6,6 @@ listDate: "Apr 17, 2026"
 wordCount: "280 Words"
 tags:
   - 仓颉
-  - 笔记
 majorCategory: Articles
 thumbnail: "/images/posts/cangjie-environment/cangjie-logo.svg"
 draft: false
