@@ -18,12 +18,6 @@ const base = import.meta.env.BASE_URL;
       <button class="transition-opacity hover:opacity-70 flex items-center" id="header-search-toggle" type="button">
         <Icon class="top-actions__ico w-6 h-6" name="search" />
       </button>
-      <div class="hidden absolute right-0 md:right-[calc(100%+0.75rem)] top-[calc(100%+0.5rem)] md:top-1/2 md:-translate-y-1/2 w-[min(20rem,calc(100vw-2.5rem))] md:w-80 z-[130] opacity-0 pointer-events-none translate-x-2 transition-all duration-200 ease-out" id="header-search-panel">
-        <div class="relative">
-          <input autocomplete="off" class="w-full bg-white/90 border border-zinc-300 text-zinc-900 placeholder:text-zinc-500 px-3 py-2 text-sm backdrop-blur-sm focus:outline-none focus:border-zinc-900 focus:ring-0 focus:ring-transparent dark:bg-zinc-950/35 dark:border-white/30 dark:text-white dark:placeholder:text-white/70 dark:focus:border-white" id="header-search-input" placeholder="Search articles..." type="text"/>
-        </div>
-        <div class="absolute top-full mt-2 left-0 w-full bg-white text-zinc-900 border border-zinc-200 shadow-lg max-h-80 overflow-y-auto opacity-0 pointer-events-none -translate-y-2 transition-all duration-200 ease-out" id="header-search-results"></div>
-      </div>
     </div>
     <button aria-label="Switch to dark mode" aria-checked="false" class="theme-switch" id="header-theme-toggle" role="switch" type="button">
       <span class="theme-switch__check">
@@ -41,6 +35,12 @@ const base = import.meta.env.BASE_URL;
     <a class="transition-opacity hover:opacity-70 flex items-center" href={`${base}rss.xml`} rel="noopener noreferrer" target="_blank" title="RSS Feed">
       <Icon class="top-actions__ico w-6 h-6" name="rss_feed" />
     </a>
+  </div>
+  <div class="hidden absolute right-0 top-[calc(100%+0.5rem)] z-[130] w-[min(20rem,calc(100vw-3rem))] opacity-0 pointer-events-none translate-x-2 transition-all duration-200 ease-out md:right-[calc(100%+0.75rem)] md:top-1/2 md:w-80 md:-translate-y-1/2" id="header-search-panel">
+    <div class="relative">
+      <input autocomplete="off" class="search-input w-full rounded-full px-4 py-2 text-sm" id="header-search-input" placeholder="Search articles..." type="text"/>
+    </div>
+    <div class="search-results absolute top-full mt-2 left-0 w-full max-h-80 overflow-y-auto rounded-2xl p-1.5 opacity-0 pointer-events-none -translate-y-2" id="header-search-results"></div>
   </div>
 </header>
 
@@ -72,6 +72,52 @@ const base = import.meta.env.BASE_URL;
   }
   .dark .top-actions__ico {
     color: rgba(250, 250, 250, 0.92);
+  }
+
+  .search-input {
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.72);
+    color: #18181b;
+    box-shadow: 0 4px 18px rgba(24, 24, 27, 0.1);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    outline: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .search-input::placeholder {
+    color: rgba(24, 24, 27, 0.42);
+  }
+  .search-input:focus {
+    border-color: rgba(24, 24, 27, 0.26);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 6px 22px rgba(24, 24, 27, 0.14);
+  }
+  .dark .search-input {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(250, 250, 250, 0.95);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  }
+  .dark .search-input::placeholder {
+    color: rgba(250, 250, 250, 0.45);
+  }
+  .dark .search-input:focus {
+    border-color: rgba(255, 255, 255, 0.36);
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .search-results {
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow: 0 12px 32px rgba(24, 24, 27, 0.16);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .dark .search-results {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(39, 39, 42, 0.88);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
   }
 
   .theme-switch {
@@ -264,7 +310,7 @@ const base = import.meta.env.BASE_URL;
 
     const renderSearchResults = () => {
       if (!searchState.matches.length) {
-        headerSearchResults.innerHTML = '<div class="px-3 py-2 text-sm text-zinc-500">No matching posts</div>';
+        headerSearchResults.innerHTML = '<div class="px-3 py-2.5 text-sm text-zinc-500 dark:text-zinc-400">No matching posts</div>';
         showSearchResults();
         return;
       }
@@ -273,11 +319,11 @@ const base = import.meta.env.BASE_URL;
         .map((item, index) => {
           const active = index === searchState.activeIndex;
           const className = active
-            ? "w-full text-left px-3 py-2 bg-zinc-100 border-b border-zinc-100 last:border-b-0"
-            : "w-full text-left px-3 py-2 hover:bg-zinc-50 border-b border-zinc-100 last:border-b-0";
+            ? "search-hit w-full text-left px-3 py-2 rounded-xl bg-zinc-900/[0.07] dark:bg-white/[0.13]"
+            : "search-hit w-full text-left px-3 py-2 rounded-xl hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.08]";
           return `<button class="${className}" data-search-index="${index}" type="button">
-              <div class="text-sm font-semibold text-zinc-900 truncate">${item.title}</div>
-              <div class="text-[11px] text-zinc-500 truncate">${(item.tags || []).join(" · ")}</div>
+              <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">${item.title}</div>
+              <div class="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">${(item.tags || []).join(" · ")}</div>
             </button>`;
         })
         .join("");
