@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection, render } from 'astro:content';
 import "katex/dist/katex.min.css";
 import CodeBlockEnhancer from '../../components/CodeBlockEnhancer.astro';
@@ -103,10 +103,10 @@ const articleJsonLd = {
   .article-body {
     --body-size: 1rem;
     --body-line: 1.72;
-    --h1-size: clamp(1.5rem, 2.25vw, 1.86rem);
-    --h2-size: clamp(1.28rem, 1.85vw, 1.54rem);
-    --h3-size: clamp(1.14rem, 1.45vw, 1.3rem);
-    --h4-size: clamp(1.04rem, 1.18vw, 1.16rem);
+    --h1-size: clamp(1.75rem, 2.6vw, 2.15rem);
+    --h2-size: clamp(1.45rem, 2.1vw, 1.75rem);
+    --h3-size: clamp(1.25rem, 1.65vw, 1.45rem);
+    --h4-size: clamp(1.1rem, 1.3vw, 1.22rem);
     color: #1f2937;
     font-family: Newsreader, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Serif SC", serif;
     font-size: var(--body-size);
@@ -470,7 +470,7 @@ const articleJsonLd = {
     <div class="flex flex-col lg:flex-row lg:items-start gap-8 xl:gap-10">
       <article class="w-full flex-1 min-w-0 max-w-4xl mx-auto lg:mx-0 bg-transparent p-0 md:p-0 shadow-none overflow-x-hidden">
         <header class="mb-10">
-          <h1 class="font-headline text-[1.75rem] md:text-[2.15rem] font-bold tracking-tight text-primary leading-tight mb-4 break-words">{title}</h1>
+          <h1 class="font-headline text-[2rem] md:text-[2.4rem] font-bold tracking-tight text-primary leading-tight mb-4 break-words">{title}</h1>
           <div class="flex flex-wrap items-start gap-3 mb-5 max-w-full">
             <img alt="Author" class="w-6 h-6 rounded-full object-cover" decoding="async" height="24" loading="lazy" src={authorAvatar} width="24"/>
             <div class="flex min-w-0 max-w-full flex-wrap items-center gap-2">
