@@ -103,7 +103,7 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
   {profileOverlay && (
     <div class="hero-profile-wash pointer-events-none absolute inset-0 z-[2] lg:hidden" aria-hidden="true"></div>
   )}
-  <div class="hero-fade absolute inset-x-0 bottom-0 z-[3] h-24 md:h-36 pointer-events-none"></div>
+  <div class="hero-fade absolute inset-x-0 bottom-0 z-[3] h-28 md:h-44 pointer-events-none"></div>
   <div class="absolute bottom-0 left-0 z-[4] w-full p-8 md:p-12">
     {title && (
       <h1
@@ -139,18 +139,20 @@ const darkLqip = "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBgCdASooABc
   .hero-fade {
     background: linear-gradient(
       to top,
-      rgba(249, 249, 249, 0.88),
-      rgba(249, 249, 249, 0.34),
-      transparent
+      rgba(249, 249, 249, 1) 0%,
+      rgba(249, 249, 249, 0.86) 24%,
+      rgba(249, 249, 249, 0.42) 62%,
+      rgba(249, 249, 249, 0) 100%
     );
   }
 
   :global(html.dark) .hero-fade {
     background: linear-gradient(
       to top,
-      rgba(26, 26, 26, 0.88),
-      rgba(26, 26, 26, 0.46),
-      transparent
+      rgba(26, 26, 26, 1) 0%,
+      rgba(26, 26, 26, 0.88) 24%,
+      rgba(26, 26, 26, 0.46) 62%,
+      rgba(26, 26, 26, 0) 100%
     );
   }
 

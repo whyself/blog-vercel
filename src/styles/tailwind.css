@@ -12,7 +12,8 @@
 
 @layer base {
   :root {
-    /* Mobile-only hero height; the profile block overlays this area. */
-    --mobile-hero-h: clamp(19rem, 84vw, 23rem);
+    /* Mobile-only hero height; the profile block overlays this area.
+       56.4vw follows the 2722x1536 hero ratio, so tablets no longer crop it. */
+    --mobile-hero-h: clamp(19rem, 56.4vw, 40rem);
   }
 }
