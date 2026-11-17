@@ -3,7 +3,7 @@ title: "用 LambdaiCJ 迁移 gcoord"
 excerpt: "记录把 gcoord 坐标转换库迁移到仓颉的过程：从目录拆分、公开入口，到 GeoJSON 支持和测试补齐。"
 publishDate: 2026-06-14
 listDate: "Jun 14, 2026"
-wordCount: "1,500 Words"
+wordCount: "1,734 Words"
 tags:
   - 仓颉
 majorCategory: Articles

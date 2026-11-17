@@ -3,7 +3,7 @@ title: 'Agent 记忆系统'
 excerpt: '从 Amadeus 的记忆工程出发，梳理 SOUL/USER/MEMORY 与 skills 的分工、记忆的读写规范，以及用 preset 把记忆组装进系统提示词的做法。'
 publishDate: 2026-10-10
 listDate: "Oct 10, 2026"
-wordCount: "3,100 Words"
+wordCount: "3,616 Words"
 tags:
   - DSH
   - Agent

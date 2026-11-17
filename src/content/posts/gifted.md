@@ -3,7 +3,7 @@ title: "Gifted"
 excerpt: "We need life,but more importantly,we need a life."
 publishDate: 2026-03-29
 listDate: "Mar 29, 2026"
-wordCount: "941 Words"
+wordCount: "776 Words"
 tags:
   - 电影
 majorCategory: Articles

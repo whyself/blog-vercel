@@ -3,7 +3,7 @@ title: "全双工模型"
 excerpt: "想要一个可以随时提问、打断的老师，于是从 VAD→ASR→LLM→TTS 的级联链路一路试到端到端全双工模型，最后搓了一个 DSH 语音插件 demo。"
 publishDate: 2026-11-16
 listDate: "Nov 16, 2026"
-wordCount: "1,580 Words"
+wordCount: "1,475 Words"
 tags:
   - DSH
   - 全双工
