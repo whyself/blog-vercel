@@ -38,9 +38,9 @@ const base = import.meta.env.BASE_URL;
   </div>
   <div class="hidden absolute right-0 top-[calc(100%+0.5rem)] z-[130] w-[min(20rem,calc(100vw-3rem))] opacity-0 pointer-events-none translate-x-2 transition-all duration-200 ease-out md:right-[calc(100%+0.75rem)] md:top-1/2 md:w-80 md:-translate-y-1/2" id="header-search-panel">
     <div class="relative">
-      <input autocomplete="off" class="search-input w-full rounded-full px-4 py-2 text-sm" id="header-search-input" placeholder="Search articles..." type="text"/>
+      <input autocomplete="off" class="search-input w-full px-4 py-2 text-sm" id="header-search-input" placeholder="Search articles..." type="text"/>
     </div>
-    <div class="search-results absolute top-full mt-2 left-0 w-full max-h-80 overflow-y-auto rounded-2xl p-1.5 opacity-0 pointer-events-none -translate-y-2" id="header-search-results"></div>
+    <div class="search-results absolute top-full mt-2 left-0 w-full max-h-80 overflow-y-auto p-1.5 opacity-0 pointer-events-none -translate-y-2" id="header-search-results"></div>
   </div>
 </header>
 
@@ -75,6 +75,7 @@ const base = import.meta.env.BASE_URL;
   }
 
   .search-input {
+    border-radius: var(--search-input-radius, 0.25rem);
     border: 1px solid rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.72);
     color: #18181b;
@@ -107,6 +108,7 @@ const base = import.meta.env.BASE_URL;
   }
 
   .search-results {
+    border-radius: var(--search-card-radius, 0.375rem);
     border: 1px solid rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.84);
     box-shadow: 0 12px 32px rgba(24, 24, 27, 0.16);
@@ -118,6 +120,10 @@ const base = import.meta.env.BASE_URL;
     border-color: rgba(255, 255, 255, 0.16);
     background: rgba(39, 39, 42, 0.88);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .search-hit {
+    border-radius: var(--search-hit-radius, 0.125rem);
   }
 
   .theme-switch {
@@ -319,8 +325,8 @@ const base = import.meta.env.BASE_URL;
         .map((item, index) => {
           const active = index === searchState.activeIndex;
           const className = active
-            ? "search-hit w-full text-left px-3 py-2 rounded-xl bg-zinc-900/[0.07] dark:bg-white/[0.13]"
-            : "search-hit w-full text-left px-3 py-2 rounded-xl hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.08]";
+            ? "search-hit w-full text-left px-3 py-2 bg-zinc-900/[0.07] dark:bg-white/[0.13]"
+            : "search-hit w-full text-left px-3 py-2 hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.08]";
           return `<button class="${className}" data-search-index="${index}" type="button">
               <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">${item.title}</div>
               <div class="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">${(item.tags || []).join(" · ")}</div>
