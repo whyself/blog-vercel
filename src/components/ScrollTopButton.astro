@@ -37,7 +37,9 @@ const { threshold = 320, appearOffset = 180 } = Astro.props;
     const appearOffset = Number(button.getAttribute("data-appear-offset") || "180");
     const initialOffsetRatio = 0.22;
     const scrollDuration = 680;
+    const directionDelta = 4;
     let activeAnimation = 0;
+    let lastScrollY = window.scrollY;
     let footerEl = null;
 
     // The footer sits after this component in the document, so look it up lazily
@@ -56,14 +58,31 @@ const { threshold = 320, appearOffset = 180 } = Astro.props;
       return Math.max(0, Math.round(contentTop - window.innerHeight * initialOffsetRatio));
     };
 
+    // Show only while scrolling up, so the round button never sits on the text
+    // someone is reading. It also stays out of the footer.
     const syncVisibility = () => {
+      const y = window.scrollY;
+      const delta = y - lastScrollY;
+      lastScrollY = y;
+
       if (isFooterInView()) {
         button.classList.remove("is-visible");
         return;
       }
+
       const contentStart = document.querySelector("[data-content-start]");
       const showAt = contentStart ? getEntryScrollTop() + appearOffset : threshold;
-      button.classList.toggle("is-visible", window.scrollY > showAt);
+
+      if (y <= showAt) {
+        button.classList.remove("is-visible");
+        return;
+      }
+
+      if (delta < -directionDelta) {
+        button.classList.add("is-visible");
+      } else if (delta > directionDelta) {
+        button.classList.remove("is-visible");
+      }
     };
 
     const animateScrollTo = (targetTop) => {
