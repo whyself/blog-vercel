@@ -12,8 +12,8 @@ const { searchItems = [] } = Astro.props as { searchItems?: SearchItem[] };
 const base = import.meta.env.BASE_URL;
 ---
 
-<header class="fixed top-8 right-8 z-[120] bg-transparent" data-search-items={encodeURIComponent(JSON.stringify(searchItems))} id="top-actions-root">
-  <div class="flex items-start space-x-4">
+<header class="fixed top-6 right-6 z-[120] rounded-full border border-white/25 bg-zinc-900/80 px-3 py-2 shadow-[0_2px_14px_rgba(0,0,0,0.3)] backdrop-blur-md dark:border-white/20 dark:bg-zinc-800/85" data-search-items={encodeURIComponent(JSON.stringify(searchItems))} id="top-actions-root">
+  <div class="flex items-center space-x-3">
     <div class="relative">
       <button class="transition-opacity hover:opacity-70 flex items-center" id="header-search-toggle" type="button">
         <Icon class="w-6 h-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]" name="search" />

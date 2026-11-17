@@ -6,7 +6,7 @@ const { threshold = 320, appearOffset = 180 } = Astro.props;
 
 <button
   aria-label="Back to top"
-  class="scroll-top-btn fixed left-12 bottom-12 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-outline-variant/40 bg-surface-container text-on-surface shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-container-high hover:shadow-lg"
+  class="scroll-top-btn fixed right-6 bottom-6 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-outline-variant/40 bg-surface-container text-on-surface shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-container-high hover:shadow-lg"
   data-scroll-top
   data-threshold={threshold}
   data-appear-offset={appearOffset}
@@ -38,6 +38,16 @@ const { threshold = 320, appearOffset = 180 } = Astro.props;
     const initialOffsetRatio = 0.22;
     const scrollDuration = 680;
     let activeAnimation = 0;
+    let footerEl = null;
+
+    // The footer sits after this component in the document, so look it up lazily
+    // and keep retrying until it exists.
+    const isFooterInView = () => {
+      footerEl = footerEl || document.querySelector("footer");
+      if (!footerEl) return false;
+      const rect = footerEl.getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom > 0;
+    };
 
     const getEntryScrollTop = () => {
       const contentStart = document.querySelector("[data-content-start]");
@@ -47,6 +57,10 @@ const { threshold = 320, appearOffset = 180 } = Astro.props;
     };
 
     const syncVisibility = () => {
+      if (isFooterInView()) {
+        button.classList.remove("is-visible");
+        return;
+      }
       const contentStart = document.querySelector("[data-content-start]");
       const showAt = contentStart ? getEntryScrollTop() + appearOffset : threshold;
       button.classList.toggle("is-visible", window.scrollY > showAt);
@@ -84,6 +98,7 @@ const { threshold = 320, appearOffset = 180 } = Astro.props;
     });
 
     window.addEventListener("scroll", syncVisibility, { passive: true });
+    window.addEventListener("resize", syncVisibility, { passive: true });
     window.addEventListener("pageshow", syncVisibility);
     syncVisibility();
   })();
