@@ -9,7 +9,6 @@ tags:
   - Agent
   - 记忆系统
 majorCategory: Articles
-thumbnail: "/images/posts/agent-memory/agent-memory-01.png"
 draft: false
 ---
 
