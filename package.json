@@ -14,8 +14,8 @@
     "words:check": "node scripts/word-count.mjs --check"
   },
   "devDependencies": {
-    "@astrojs/markdown-remark": "^7.2.0",
-    "astro": "^6.4.8",
+    "@astrojs/markdown-remark": "^7.3.9",
+    "astro": "^7.4.12",
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.15",
     "tailwindcss": "^3.4.19",
